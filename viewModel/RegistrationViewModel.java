@@ -1,15 +1,15 @@
 package viewModel;
 
-import DAO.registrationDAO;
-import model.registration;
+import DAO.UserDAO;
+import model.User;
 import java.util.regex.Pattern;
 
 public class RegistrationViewModel {
 
-    private registrationDAO regDAO = new registrationDAO();
+    private UserDAO regDAO = new UserDAO();
 
     
-    private boolean validateBlankFields(registration r) {
+    private boolean validateBlankFields(User r) {
         return r.getUsername().isEmpty()
                 || r.getPassword().isEmpty()
                 || r.getName().isEmpty()
@@ -26,7 +26,7 @@ public class RegistrationViewModel {
         return Pattern.matches(regex, password);
     }
 
-    public String registerUser(registration r) {
+    public String registerUser(User r) {
         
         if (validateBlankFields(r)) {
             return "Please fill all of the fields";

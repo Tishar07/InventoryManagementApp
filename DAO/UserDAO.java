@@ -1,9 +1,11 @@
 package DAO;
 
 import database.DBConnection;
+import model.User;
+
 import java.sql.*;
 
-public class registrationDAO {
+public class UserDAO {
 
     public boolean usernameExists(String username) {
         String sql = "SELECT 1 FROM users WHERE username = ?";
@@ -21,7 +23,7 @@ public class registrationDAO {
         return false;
     }
 
-    public boolean insertUser(model.registration r) {
+    public boolean insertUser(User r) {
         String sql = "INSERT INTO users " +
                 "(username, role, password, name, email, status, address, contact) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
