@@ -10,45 +10,110 @@ public class UserDAO {
     public UserDAO(Connection connection){
         this.connection= connection;
     }
-    public boolean usernameExists(String username) {
-        String sql = "SELECT 1 FROM users WHERE username = ?";
+
+    public User findByUsername(String username) {
+
+        String sql = """
+            SELECT u.user_id,u.username,u.password,u.role,p.name,p.email,p.status,p.address,p.contact
+            FROM Users u
+            JOIN Person p ON u.user_id = p.person_id
+            WHERE u.username = ?
+        """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
-            return rs.next();
+
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("user_id"),
+                        rs.getString("username"),
+                        rs.getString("role"),
+                        rs.getString("password"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("status"),
+                        rs.getString("contact"),
+                        rs.getString("address")
+                );
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Database error", e);
         }
-        return false;
+
+        return null;
     }
 
-    public boolean insertUser(User r) {
-        String sql = "INSERT INTO users " +
-                "(username, role, password, name, email, status, address, contact) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public void insert(User r) {
+
+        String insertPerson = """
+            INSERT INTO Person (name, email, contact, address, status)
+            VALUES (?, ?, ?, ?, ?)
+        """;
+
+        String insertUser = """
+            INSERT INTO Users (user_id, username, password, role)
+            VALUES (?, ?, ?, ?)
+        """;
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            int personId;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    insertPerson, Statement.RETURN_GENERATED_KEYS)) {
+
+                ps.setString(1, r.getName());
+                ps.setString(2, r.getEmail());
+                ps.setString(3, r.getContact());
+                ps.setString(4, r.getAddress());
+                ps.setString(5, r.getStatus());
+                ps.executeUpdate();
+
+                ResultSet keys = ps.getGeneratedKeys();
+                if (!keys.next()) {
+                    throw new SQLException("Failed to generate person_id");
+                }
+                personId = keys.getInt(1);
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(insertUser)) {
+                ps.setInt(1, personId);
+                ps.setString(2, r.getUsername());
+                ps.setString(3, r.getPassword());
+                ps.setString(4, r.getRole());
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to insert user", e);
+        }
+    }
+
+    public void deleteByUsername(String username) {
+
+        String sql = """
+            DELETE p
+            FROM Person p
+            JOIN Users u ON p.person_id = u.user_id
+            WHERE u.username = ?
+        """;
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, r.getUsername());
-            ps.setString(2, r.getRole());
-            ps.setString(3, r.getPassword());
-            ps.setString(4, r.getName());
-            ps.setString(5, r.getEmail());
-            ps.setString(6, r.getStatus());
-            ps.setString(7, r.getAddress());
-            ps.setString(8, r.getContact());
-
-            return ps.executeUpdate() > 0;
+            ps.setString(1, username);
+            ps.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Delete failed", e);
         }
-        return false;
     }
 
     //Query to fetch data from table (user,person) to validate login details

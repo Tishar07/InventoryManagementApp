@@ -1,11 +1,18 @@
 package view;
 
+
+import model.User;
+import viewModel.RegistrationViewModel;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class RegisterView extends JFrame {
 
     public RegisterView() {
+        RegistrationViewModel vm = new RegistrationViewModel();
 
         setTitle("Registration Form");
         setSize(800, 500);
@@ -57,6 +64,25 @@ public class RegisterView extends JFrame {
         rightPanel.add(emailField, gbc);
 
         gbc.gridy++;
+        JLabel contactLabel = new JLabel("Contact");
+        rightPanel.add(contactLabel, gbc);
+
+        gbc.gridy++;
+        JTextField contactField = new JTextField(40);
+        contactField.setPreferredSize(new Dimension(400, 40));
+        rightPanel.add(contactField, gbc);
+
+        gbc.gridy++;
+        JLabel addressLabel = new JLabel("Address");
+        rightPanel.add(addressLabel, gbc);
+
+        gbc.gridy++;
+        JTextField addressField = new JTextField(40);
+        addressField.setPreferredSize(new Dimension(400, 40));
+        rightPanel.add(addressField, gbc);
+
+
+        gbc.gridy++;
         JLabel passLabel = new JLabel("Password");
         rightPanel.add(passLabel, gbc);
 
@@ -64,6 +90,15 @@ public class RegisterView extends JFrame {
         JPasswordField passField = new JPasswordField(40);
         passField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(passField, gbc);
+
+        gbc.gridy++;
+        JLabel confirmPassLabel = new JLabel("Confirm Password");
+        rightPanel.add(confirmPassLabel, gbc);
+
+        gbc.gridy++;
+        JPasswordField confirmPassField = new JPasswordField(40);
+        confirmPassField.setPreferredSize(new Dimension(400, 40));
+        rightPanel.add(confirmPassField, gbc);
 
         gbc.gridy++;
         JButton RegisterBtn = new JButton("Register");
@@ -81,6 +116,36 @@ public class RegisterView extends JFrame {
         loginBtn.setForeground(new Color(255, 51, 51));
         loginBtn.setPreferredSize(new Dimension(150, 35));
         rightPanel.add(loginBtn, gbc);
+
+        RegisterBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = userField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passField.getPassword());
+                String contact = contactField.getText().trim();
+                String address = addressField.getText().trim();
+
+                String confirmPassword = new String(confirmPassField.getPassword());
+                if (!password.equals(confirmPassword)) {
+                    JOptionPane.showMessageDialog(RegisterView.this, "Passwords do not match!");
+                    return;
+                }
+
+                User user = new User(0, username, "User", password, username, email, "Active", address, contact);
+                String result = vm.registerUser(user);
+                JOptionPane.showMessageDialog(RegisterView.this, result);
+
+                if ("Registration successful".equals(result)) {
+                    userField.setText("");
+                    emailField.setText("");
+                    contactField.setText("");
+                    addressField.setText("");
+                    passField.setText("");
+                    confirmPassField.setText("");
+                }
+            }
+        });
 
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.CENTER);

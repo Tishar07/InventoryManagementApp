@@ -2,14 +2,15 @@ package viewModel;
 
 import DAO.UserDAO;
 import model.User;
+
 import java.util.regex.Pattern;
 
 public class RegistrationViewModel {
 
-    private UserDAO regDAO ;
+    private final UserDAO userDAO = new UserDAO();
 
-    
-    private boolean validateBlankFields(User r) {
+
+    private boolean hasBlankFields(User r) {
         return r.getUsername().isEmpty()
                 || r.getPassword().isEmpty()
                 || r.getName().isEmpty()
@@ -26,26 +27,31 @@ public class RegistrationViewModel {
         return Pattern.matches(regex, password);
     }
 
+
     public String registerUser(User r) {
-        
-        if (validateBlankFields(r)) {
-            return "Please fill all of the fields";
+
+
+        if (hasBlankFields(r)) {
+            return "Please fill all fields";
         }
-        
-        //Mone call sa function la depi registrationDAO
-        if (regDAO.usernameExists(r.getUsername())) {
-            return "Username already exists in the database";
+
+
+        User existingUser = userDAO.findByUsername(r.getUsername());
+        if (existingUser != null) {
+            return "Username already exists";
         }
+
 
         if (!isPasswordValid(r.getPassword())) {
-            return "Password must have uppercase, lowercase, number , symbol and number of character must be more than 8";
+            return "Password must contain uppercase, lowercase, number and symbol";
         }
 
-        boolean saved = regDAO.insertUser(r);
 
-        if (saved) {
+        try {
+            userDAO.insert(r);
             return "Registration successful";
+        } catch (RuntimeException e) {
+            return "Registration failed";
         }
-        return "Registration failed:";
     }
 }
