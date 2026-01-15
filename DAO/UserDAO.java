@@ -6,7 +6,10 @@ import model.User;
 import java.sql.*;
 
 public class UserDAO {
-
+    private Connection connection;
+    public UserDAO(Connection connection){
+        this.connection= connection;
+    }
     public boolean usernameExists(String username) {
         String sql = "SELECT 1 FROM users WHERE username = ?";
 
@@ -47,4 +50,36 @@ public class UserDAO {
         }
         return false;
     }
+
+    //Query to fetch data from table (user,person) to validate login details
+    public User validateLogin(String Username,String Password){
+        String sql = "SELECT x.*,z.* " +
+                     "FROM users x " +
+                     "INNER JOIN person z ON x.user_id = z.person_id " +
+                     "WHERE x.username = ? AND x.password = ?";
+
+        try(Connection conn = DBConnection.getConnection();PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, Username);
+            ps.setString(2, Password);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()){
+                return new User(
+                        rs.getInt("x.user_id"),
+                        rs.getString("x.username"),
+                        rs.getString("x.role"),
+                        rs.getString("x.password"),
+                        rs.getString("z.name"),
+                        rs.getString("z.email"),
+                        rs.getString("z.status"),
+                        rs.getString("z.address"),
+                        rs.getString("z.contact")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
 }

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class RegistrationViewModel {
 
-    private UserDAO regDAO = new UserDAO();
+    private UserDAO regDAO ;
 
     
     private boolean validateBlankFields(User r) {

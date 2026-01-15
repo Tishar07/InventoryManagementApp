@@ -1,36 +1,51 @@
 package view;
+import viewModel.LoginViewModel;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class LoginView extends javax.swing.JFrame {
+    private LoginViewModel viewModel;
+    public LoginView(LoginViewModel viewModel) {
+        this.viewModel = viewModel;
+        initComponents();
+    }
 
-    public LoginView() {
+    private void initComponents() {
+        //SET JFrame Properties
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("LOGIN");
         setLocationRelativeTo(null);
         setResizable(true);
 
-        initComponents();
-    }
-
-    private void initComponents() {
-
+        //SET JPanels
         JPanel MainPanel = new JPanel();
         JPanel LeftPanel = new JPanel();
+
+        //SET JLabels
         JLabel LabelLogo = new JLabel("LOGO");
         JPanel RightPanel = new JPanel();
+
         JLabel LabelTitle = new JLabel("LOGIN");
         JLabel LabelUsername = new JLabel("Username: ");
         JLabel LabelPass = new JLabel("Password: ");
-        JTextField UsernameText = new JTextField();
-        JPasswordField PassText = new JPasswordField();
-        JButton LoginButton = new JButton("Login");
-        JLabel LabelRegister = new JLabel("Don't have an account?");
-        JButton RegisterButton = new JButton("Sign up");
 
+        //SET JTextFields
+        JTextField UsernameText = new JTextField();
+        JTextField PassText = new JTextField();
+
+        //SET JButtons
+        JButton LoginButton = new JButton("Login");
+        JButton RegisterButton = new JButton("Sign up");
+        JLabel LabelRegister = new JLabel("Don't have an account?");
+
+        //SET Panel Layout Manager
         MainPanel.setLayout(new BorderLayout());
 
+        //Styling Left panel
         LeftPanel.setBackground(new Color(30,75,176));
         LeftPanel.setPreferredSize(new Dimension(250,400));
         LeftPanel.setLayout(new GridBagLayout());
@@ -38,14 +53,17 @@ public class LoginView extends javax.swing.JFrame {
         LabelLogo.setForeground(Color.WHITE);
         LeftPanel.add(LabelLogo);
 
+        //Styling Right Panel
         RightPanel.setLayout(null);
         RightPanel.setBackground(Color.WHITE);
 
+        //Styling for Login main Text
         LabelTitle.setFont(new Font("Arial", Font.BOLD, 24));
         LabelTitle.setForeground(new Color(30,75,176));
         LabelTitle.setBounds(320,40,200,30);
         RightPanel.add(LabelTitle);
 
+        //Styling for Username
         LabelUsername.setFont(new Font("Arial", Font.BOLD, 14));
         LabelUsername.setBounds(220,100,100,25);
         RightPanel.add(LabelUsername);
@@ -55,6 +73,7 @@ public class LoginView extends javax.swing.JFrame {
         UsernameText.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         RightPanel.add(UsernameText);
 
+        //Styling for Password
         LabelPass.setFont(new Font("Arial", Font.BOLD, 14));
         LabelPass.setBounds(220, 150, 100, 25);
         RightPanel.add(LabelPass);
@@ -64,6 +83,7 @@ public class LoginView extends javax.swing.JFrame {
         PassText.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         RightPanel.add(PassText);
 
+        //Styling for Login Button
         LoginButton.setBounds(300, 210, 100, 35);
         LoginButton.setBackground(new Color(30, 90, 200));
         LoginButton.setForeground(Color.WHITE);
@@ -73,6 +93,7 @@ public class LoginView extends javax.swing.JFrame {
         LoginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         RightPanel.add(LoginButton);
 
+        //Styling for Register Button
         LabelRegister.setFont(new Font("Arial", Font.PLAIN, 13));
         LabelRegister.setBounds(300, 270, 160, 25);
         RightPanel.add(LabelRegister);
@@ -89,13 +110,26 @@ public class LoginView extends javax.swing.JFrame {
         MainPanel.add(LeftPanel, BorderLayout.WEST);
         MainPanel.add(RightPanel, BorderLayout.CENTER);
 
+        //EVENT LISTNER
+        LoginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    boolean Success = viewModel.login(
+                            UsernameText.getText(),
+                            PassText.getText()
+                    );
+                    if (Success==true){
+                        //REMOVE OptionPane to redirect to Main Page
+                        JOptionPane.showMessageDialog(LoginView.this,"Login Successful");
+                    }else {
+                        JOptionPane.showMessageDialog(LoginView.this,"Login Invalid");
+                    }
+            }
+        });
+
+
         add(MainPanel);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new LoginView().setVisible(true);
-        });
-    }
 }
 
