@@ -2,6 +2,7 @@ package view;
 
 
 import model.User;
+import utilities.Navigator;
 import viewModel.RegistrationViewModel;
 import javax.swing.*;
 import java.awt.*;
@@ -10,113 +11,134 @@ import java.awt.event.ActionListener;
 
 
 public class RegisterView extends JFrame {
+    private RegistrationViewModel viewModel;
+    JPanel leftPanel = new JPanel();
+    JLabel brandingLabel = new JLabel("<html><center><font color='white' size='6'>LOGO<br>NAME</font></center></html>");
+    JPanel rightPanel = new JPanel();
+    GridBagConstraints gbc = new GridBagConstraints();
+    JLabel title = new JLabel("REGISTER", SwingConstants.CENTER);
+    JLabel userLabel = new JLabel("Username");
+    JLabel emailLabel = new JLabel("Email");
+    JLabel contactLabel = new JLabel("Contact");
+    JLabel addressLabel = new JLabel("Address");
+    JLabel passLabel = new JLabel("Password");
+    JLabel confirmPassLabel = new JLabel("Confirm Password");
+    JLabel loginLink = new JLabel("Already have an account?");
+    JButton RegisterBtn = new JButton("Register");
+    JButton loginBtn = new JButton("Login");
+    JTextField userField = new JTextField(40);
+    JTextField emailField = new JTextField(40);
+    JTextField contactField = new JTextField(40);
+    JPasswordField passField = new JPasswordField(40);
+    JPasswordField confirmPassField = new JPasswordField(40);
+    JTextField addressField = new JTextField(40);
 
-    public RegisterView() {
-        RegistrationViewModel vm = new RegistrationViewModel();
+    public RegisterView(RegistrationViewModel viewModel){
+        this.viewModel = viewModel;
+        initComponents();
+    }
 
+    public void initComponents() {
+        //SET JFrame
         setTitle("Registration Form");
-        setSize(800, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
 
-        JPanel leftPanel = new JPanel();
+        //Styling LeftPanel
         leftPanel.setBackground(new Color(30, 75, 176));
         leftPanel.setPreferredSize(new Dimension(500, 500));
         leftPanel.setLayout(new GridBagLayout());
-
-        JLabel brandingLabel = new JLabel("<html><center><font color='white' size='6'>LOGO<br>NAME</font></center></html>");
         leftPanel.add(brandingLabel);
 
-
-        JPanel rightPanel = new JPanel();
+        //Styling RightPanel
         rightPanel.setBackground(Color.WHITE);
         rightPanel.setLayout(new GridBagLayout());
 
-        GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10); // spacing
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        JLabel title = new JLabel("REGISTER", SwingConstants.CENTER);
+        //Styling for page Fonts and font color
         title.setFont(new Font("Segoe UI", Font.BOLD, 36));
         title.setForeground(new Color(30, 75, 176));
         rightPanel.add(title, gbc);
-
         gbc.gridy++;
-        JLabel userLabel = new JLabel("Username");
         rightPanel.add(userLabel, gbc);
 
         gbc.gridy++;
-        JTextField userField = new JTextField(40);
+
+        //Styling UserField
         userField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(userField, gbc);
-
         gbc.gridy++;
-        JLabel emailLabel = new JLabel("Email");
         rightPanel.add(emailLabel, gbc);
 
         gbc.gridy++;
-        JTextField emailField = new JTextField(40);
+
+        //Styling emailField
         emailField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(emailField, gbc);
-
         gbc.gridy++;
-        JLabel contactLabel = new JLabel("Contact");
         rightPanel.add(contactLabel, gbc);
 
         gbc.gridy++;
-        JTextField contactField = new JTextField(40);
+
+        //Styling contactField
         contactField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(contactField, gbc);
-
         gbc.gridy++;
-        JLabel addressLabel = new JLabel("Address");
         rightPanel.add(addressLabel, gbc);
 
         gbc.gridy++;
-        JTextField addressField = new JTextField(40);
+
+        //Styling addressField
         addressField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(addressField, gbc);
-
-
         gbc.gridy++;
-        JLabel passLabel = new JLabel("Password");
         rightPanel.add(passLabel, gbc);
 
         gbc.gridy++;
-        JPasswordField passField = new JPasswordField(40);
+
+        //Styling passField
         passField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(passField, gbc);
-
         gbc.gridy++;
-        JLabel confirmPassLabel = new JLabel("Confirm Password");
         rightPanel.add(confirmPassLabel, gbc);
 
         gbc.gridy++;
-        JPasswordField confirmPassField = new JPasswordField(40);
+
+        //Styling confirmPassField
         confirmPassField.setPreferredSize(new Dimension(400, 40));
         rightPanel.add(confirmPassField, gbc);
-
         gbc.gridy++;
-        JButton RegisterBtn = new JButton("Register");
+
+        //Styling Register Button
         RegisterBtn.setBackground(new Color(0, 102, 102));
         RegisterBtn.setForeground(Color.WHITE);
         RegisterBtn.setPreferredSize(new Dimension(150, 40));
         rightPanel.add(RegisterBtn, gbc);
-
         gbc.gridy++;
-        JLabel loginLink = new JLabel("Already have an account?");
         rightPanel.add(loginLink, gbc);
 
         gbc.gridy++;
-        JButton loginBtn = new JButton("Login");
+
+        //Styling Login Button
         loginBtn.setForeground(new Color(255, 51, 51));
         loginBtn.setPreferredSize(new Dimension(150, 35));
         rightPanel.add(loginBtn, gbc);
 
+
+        Action();
+        add(leftPanel, BorderLayout.WEST);
+        add(rightPanel, BorderLayout.CENTER);
+        setVisible(true);
+    }
+
+    public void Action(){
         RegisterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,7 +155,7 @@ public class RegisterView extends JFrame {
                 }
 
                 User user = new User(0, username, "User", password, username, email, "Active", address, contact);
-                String result = vm.registerUser(user);
+                String result = viewModel.registerUser(user);
                 JOptionPane.showMessageDialog(RegisterView.this, result);
 
                 if ("Registration successful".equals(result)) {
@@ -143,19 +165,19 @@ public class RegisterView extends JFrame {
                     addressField.setText("");
                     passField.setText("");
                     confirmPassField.setText("");
+                    Navigator.showLogin();
                 }
             }
         });
+        loginBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Navigator.showLogin();
+            }
+        });
 
-        add(leftPanel, BorderLayout.WEST);
-        add(rightPanel, BorderLayout.CENTER);
-
-        setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new RegisterView();
-    }
 }
 
 

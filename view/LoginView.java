@@ -1,14 +1,31 @@
 package view;
-import viewModel.LoginViewModel;
 
+import utilities.Navigator;
+import viewModel.LoginViewModel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 public class LoginView extends javax.swing.JFrame {
     private LoginViewModel viewModel;
-    public LoginView(LoginViewModel viewModel) {
+    JPanel MainPanel = new JPanel();
+    JPanel LeftPanel = new JPanel();
+    JLabel LabelLogo = new JLabel("LOGO");
+    JPanel RightPanel = new JPanel();
+    JLabel LabelTitle = new JLabel("LOGIN");
+    JLabel LabelUsername = new JLabel("Username: ");
+    JLabel LabelPass = new JLabel("Password: ");
+    JTextField UsernameText = new JTextField();
+    JTextField PassText = new JTextField();
+    JButton LoginButton = new JButton("Login");
+    JButton RegisterButton = new JButton("Sign up");
+    JLabel LabelRegister = new JLabel("Don't have an account?");
+
+    //private UserDAO userDAO = new UserDAO();
+
+    public LoginView(LoginViewModel viewModel){
         this.viewModel = viewModel;
         initComponents();
     }
@@ -21,26 +38,6 @@ public class LoginView extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setResizable(true);
 
-        //SET JPanels
-        JPanel MainPanel = new JPanel();
-        JPanel LeftPanel = new JPanel();
-
-        //SET JLabels
-        JLabel LabelLogo = new JLabel("LOGO");
-        JPanel RightPanel = new JPanel();
-
-        JLabel LabelTitle = new JLabel("LOGIN");
-        JLabel LabelUsername = new JLabel("Username: ");
-        JLabel LabelPass = new JLabel("Password: ");
-
-        //SET JTextFields
-        JTextField UsernameText = new JTextField();
-        JTextField PassText = new JTextField();
-
-        //SET JButtons
-        JButton LoginButton = new JButton("Login");
-        JButton RegisterButton = new JButton("Sign up");
-        JLabel LabelRegister = new JLabel("Don't have an account?");
 
         //SET Panel Layout Manager
         MainPanel.setLayout(new BorderLayout());
@@ -110,25 +107,33 @@ public class LoginView extends javax.swing.JFrame {
         MainPanel.add(LeftPanel, BorderLayout.WEST);
         MainPanel.add(RightPanel, BorderLayout.CENTER);
 
-        //EVENT LISTNER
+        Actions();
+        add(MainPanel);
+    }
+
+    public void Actions(){
+        //EVENT LISTENER For Login
         LoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    boolean Success = viewModel.login(
-                            UsernameText.getText(),
-                            PassText.getText()
-                    );
-                    if (Success==true){
-                        //REMOVE OptionPane to redirect to Main Page
-                        JOptionPane.showMessageDialog(LoginView.this,"Login Successful");
-                    }else {
-                        JOptionPane.showMessageDialog(LoginView.this,"Login Invalid");
-                    }
+                boolean Success = viewModel.login(
+                        UsernameText.getText(),
+                        PassText.getText()
+                );
+                if (Success==true){
+                    //REMOVE OptionPane to redirect to Main Page
+                    JOptionPane.showMessageDialog(LoginView.this,"Login Successful");
+                }else {
+                    JOptionPane.showMessageDialog(LoginView.this,"Login Invalid");
+                }
             }
         });
-
-
-        add(MainPanel);
+        RegisterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Navigator.showRegister();
+            }
+        });
     }
 
 }

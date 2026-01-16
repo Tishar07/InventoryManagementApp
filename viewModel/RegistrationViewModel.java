@@ -7,8 +7,10 @@ import java.util.regex.Pattern;
 
 public class RegistrationViewModel {
 
-    private final UserDAO userDAO = new UserDAO();
-
+    private UserDAO userdao;
+    public RegistrationViewModel(UserDAO userdao){
+        this.userdao = userdao;
+    }
 
     private boolean hasBlankFields(User r) {
         return r.getUsername().isEmpty()
@@ -36,7 +38,7 @@ public class RegistrationViewModel {
         }
 
 
-        User existingUser = userDAO.findByUsername(r.getUsername());
+        User existingUser = userdao.findByUsername(r.getUsername());
         if (existingUser != null) {
             return "Username already exists";
         }
@@ -48,7 +50,7 @@ public class RegistrationViewModel {
 
 
         try {
-            userDAO.insert(r);
+            userdao.insert(r);
             return "Registration successful";
         } catch (RuntimeException e) {
             return "Registration failed";

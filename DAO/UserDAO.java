@@ -6,9 +6,9 @@ import model.User;
 import java.sql.*;
 
 public class UserDAO {
-    private Connection connection;
-    public UserDAO(Connection connection){
-        this.connection= connection;
+    private Connection conn;
+    public UserDAO(Connection conn){
+        this.conn= conn;
     }
 
     public User findByUsername(String username) {
@@ -20,8 +20,7 @@ public class UserDAO {
             WHERE u.username = ?
         """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
@@ -59,11 +58,10 @@ public class UserDAO {
             VALUES (?, ?, ?, ?)
         """;
 
-        try (Connection conn = DBConnection.getConnection()) {
-
+        try {
             conn.setAutoCommit(false);
-
             int personId;
+
             try (PreparedStatement ps = conn.prepareStatement(
                     insertPerson, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -105,8 +103,7 @@ public class UserDAO {
             WHERE u.username = ?
         """;
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
             ps.executeUpdate();
@@ -123,7 +120,7 @@ public class UserDAO {
                      "INNER JOIN person z ON x.user_id = z.person_id " +
                      "WHERE x.username = ? AND x.password = ?";
 
-        try(Connection conn = DBConnection.getConnection();PreparedStatement ps = conn.prepareStatement(sql)){
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setString(1, Username);
             ps.setString(2, Password);
             ResultSet rs = ps.executeQuery();
