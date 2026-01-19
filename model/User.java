@@ -1,5 +1,5 @@
 package model;
-public class registration {
+public class User {
     private int userid;
     private String username;
     private String role;
@@ -10,7 +10,7 @@ public class registration {
     private String address;
     private String contact;
 
-    public registration(int userid,String username,String role,String password,String name, String email, String status,String address,String contact){
+    public User(int userid, String username, String role, String password, String name, String email, String status, String address, String contact){
         this.userid = userid;
         this.username = username;
         this.role = role;
