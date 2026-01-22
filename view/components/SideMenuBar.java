@@ -8,6 +8,9 @@ import java.awt.event.MouseEvent;
 public class SideMenuBar extends  JPanel{
     private JPanel LeftPanel;
     private JPanel RightPanel;
+    public SideMenuBar() {
+        SideBarInt();
+    }
 
 
     public void SideBarInt(){
@@ -91,6 +94,11 @@ public class SideMenuBar extends  JPanel{
         //SET Main Panel
         RightPanel = new JPanel();
         add(RightPanel,BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(RightPanel);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        add(scrollPane, BorderLayout.CENTER);
 
     }
 
