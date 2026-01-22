@@ -1,9 +1,6 @@
 /*package view;
-
-import com.sun.tools.javac.Main;
-import utilities.Navigator;
+import model.Product;
 import view.components.SideMenuBar;
-import viewModel.LoginViewModel;
 import viewModel.ProductViewModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,15 +13,19 @@ public class ProductView extends JFrame{
 
     JPanel MainPanel = new JPanel();
     JPanel RightPanel = new JPanel();
+
     JLabel LabelTitle = new JLabel("PRODUCT MANAGEMENT");
     JLabel LabelName = new JLabel("Product Name:");
     JLabel LabelPrice = new JLabel("Price:");
     JLabel LabelQuantity = new JLabel("Quantity:");
-    JLabel LabelCategory = new JLabel("Category:");
+    JLabel LabelSubCategory = new JLabel("SubCategory:");
+
     JTextField TxtName = new JTextField();
     JTextField TxtPrice = new JTextField();
     JTextField TxtQuantity = new JTextField();
-    JComboBox<String> CmbCategory = new JComboBox<>();
+    JComboBox<String> CmbSubCategory = new JComboBox<>();
+
+
     JButton AddButton = new JButton("Add Product");
     JButton UpdateButton = new JButton("Update");
     JButton DeleteButton = new JButton("Delete");
@@ -79,11 +80,11 @@ public class ProductView extends JFrame{
         TxtQuantity.setBounds(160, 190, 220, 30);
         RightPanel.add(LabelQuantity);
         RightPanel.add(TxtQuantity);
-        //styling for category
-        LabelCategory.setBounds(40, 240, 120, 25);
-        CmbCategory.setBounds(160, 240, 220, 30);
-        RightPanel.add(LabelCategory);
-        RightPanel.add(CmbCategory);
+        //styling for subcategory
+        LabelSubCategory.setBounds(40, 240, 120, 25);
+        CmbSubCategory.setBounds(160, 240, 220, 30);
+        RightPanel.add(LabelSubCategory);
+        RightPanel.add(CmbSubCategory);
 
         //Styling for add button
         AddButton.setBounds(420, 90, 120, 35);
@@ -128,7 +129,7 @@ public class ProductView extends JFrame{
         ClearButton.add(ClearButton);
         RightPanel.add(ClearButton);
 
-        tableModel = new DefaultTableModel(new Object[]{"ID", "Name", "Price", "Quantity", "Category"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"ID", "Name","SubCategory", "Price", "Quantity"}, 0);
         productTable.setModel(tableMode);
 
         JScrollPane scrollPane = new JScrollPane(productTable);
@@ -180,6 +181,13 @@ public class ProductView extends JFrame{
                 viewModel.onTableSelect();
             }
         });
+
+    public JTextField getTxtName() { return TxtName; }
+    public JTextField getTxtPrice() { return TxtPrice; }
+    public JTextField getTxtQuantity() { return TxtQuantity; }
+    public JComboBox<String> getCmbSubCategory() { return CmbSubCategory; }
+    public JTable getProductTable() { return productTable; }
+    public DefaultTableModel getTableModel() { return tableModel; }
     }
 
- */
+*/
