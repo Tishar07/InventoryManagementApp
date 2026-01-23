@@ -6,8 +6,7 @@ import java.awt.*;
 public class TopBarFactory extends JPanel {
 
     public final JButton btnAdd;
-    public final JButton btnClear;
-    public final JButton btnUpdate;
+    public final JButton btnViewEdit;
     public final JButton btnDelete;
     public final JButton btnSearch;
     public final JComboBox<String> cmbSort;
@@ -23,19 +22,17 @@ public class TopBarFactory extends JPanel {
 
         // Buttons
         btnAdd    = ButtonFactory.createButtonPlain();
-        btnClear  = ButtonFactory.createButtonPlain();
-        btnUpdate = ButtonFactory.createButtonPlain();
+        btnViewEdit = ButtonFactory.createButtonPlain();
         btnDelete = ButtonFactory.createButtonPlain();
         btnSearch = ButtonFactory.createButtonPlain();
 
         btnAdd.setText("Add");
-        btnClear.setText("Clear");
-        btnUpdate.setText("Update");
+        btnViewEdit.setText("View/Edit");
         btnDelete.setText("Delete");
         btnSearch.setText("Search");
 
         JButton[] buttons = {
-                btnAdd, btnClear, btnUpdate, btnDelete, btnSearch
+                btnAdd, btnViewEdit, btnDelete, btnSearch
         };
 
         for (JButton b : buttons) {
@@ -61,8 +58,7 @@ public class TopBarFactory extends JPanel {
 
         // Add components
         add(btnAdd);
-        add(btnClear);
-        add(btnUpdate);
+        add(btnViewEdit);
         add(btnDelete);
         add(cmbSort);
         add(lblSearch);
