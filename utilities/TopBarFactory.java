@@ -15,7 +15,7 @@ public class TopBarFactory extends JPanel {
 
     public TopBarFactory(String searchLabelText, String[] sortOptions) {
 
-        setLayout(new FlowLayout(FlowLayout.RIGHT, 8, 5));
+        setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 5));
         setBackground(new Color(240, 240, 240));
 
         Font fontBold = new Font("Segoe UI", Font.BOLD, 14);
@@ -53,6 +53,11 @@ public class TopBarFactory extends JPanel {
 
         txtSearch = new JTextField(40);
         txtSearch.setFont(fontBold);
+
+        txtSearch.setBorder(BorderFactory.createCompoundBorder(
+                txtSearch.getBorder(),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10) // Top, Left, Bottom, Right padding
+        ));
 
         // Add components
         add(btnAdd);
