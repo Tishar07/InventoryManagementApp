@@ -116,9 +116,9 @@ public class UserDAO {
     //Query to fetch data from table (user,person) to validate login details
     public User validateLogin(String Username,String Password){
         String sql = "SELECT x.*,z.* " +
-                     "FROM users x " +
-                     "INNER JOIN person z ON x.user_id = z.person_id " +
-                     "WHERE x.username = ? AND x.password = ?";
+                     "FROM user x " +
+                     "INNER JOIN person z ON x.UserID = z.PersonID " +
+                     "WHERE x.Username = ? AND x.Password = ?";
 
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setString(1, Username);
@@ -127,15 +127,15 @@ public class UserDAO {
 
             if (rs.next()){
                 return new User(
-                        rs.getInt("x.user_id"),
-                        rs.getString("x.username"),
-                        rs.getString("x.role"),
-                        rs.getString("x.password"),
-                        rs.getString("z.name"),
-                        rs.getString("z.email"),
-                        rs.getString("z.status"),
-                        rs.getString("z.address"),
-                        rs.getString("z.contact")
+                        rs.getInt("x.UserID"),
+                        rs.getString("x.Username"),
+                        rs.getString("x.Role"),
+                        rs.getString("x.Password"),
+                        rs.getString("z.Name"),
+                        rs.getString("z.Email"),
+                        rs.getString("z.Status"),
+                        rs.getString("z.Address"),
+                        rs.getString("z.Contact")
                 );
             }
         } catch (SQLException e) {

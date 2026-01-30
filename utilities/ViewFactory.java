@@ -1,10 +1,13 @@
 package utilities;
 
 
+import DAO.ProductDAO;
 import database.DBConnection;
 import view.LoginView;
+import view.ProductFormView;
 import view.RegisterView;
 import viewModel.LoginViewModel;
+import viewModel.ProductFormViewModel;
 import viewModel.RegistrationViewModel;
 
 import java.sql.Connection;
@@ -15,11 +18,13 @@ public class ViewFactory {
 
     private static Connection connection;
     private static UserDAO userDAO;
+    private static ProductDAO productDAO;
 
     static {
         try {
             connection = DBConnection.getConnection();
             userDAO = new UserDAO(connection);
+            productDAO = new ProductDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -34,5 +39,13 @@ public class ViewFactory {
         RegistrationViewModel viewModel = new RegistrationViewModel(userDAO);
         return new RegisterView(viewModel);
     }
+
+    public static ProductFormView createProductFormView () {
+        ProductFormViewModel viewModel = new ProductFormViewModel(productDAO);
+        return new ProductFormView(viewModel);
+    }
+
+
+
 
 }
