@@ -18,7 +18,7 @@ public class LoginView extends javax.swing.JFrame {
     JLabel LabelUsername = new JLabel("Username: ");
     JLabel LabelPass = new JLabel("Password: ");
     JTextField UsernameText = new JTextField();
-    JTextField PassText = new JTextField();
+    JPasswordField PassText = new JPasswordField();
     JButton LoginButton = new JButton("Login");
     JButton RegisterButton = new JButton("Sign up");
     JLabel LabelRegister = new JLabel("Don't have an account?");
@@ -76,7 +76,7 @@ public class LoginView extends javax.swing.JFrame {
         RightPanel.add(LabelPass);
 
         PassText.setBounds(300, 150, 250, 30);
-        PassText.setFont(new Font("Arial", Font.PLAIN, 14));
+        //PassText.setFont(new Font("Arial", Font.PLAIN, 14));
         PassText.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         RightPanel.add(PassText);
 
@@ -116,13 +116,14 @@ public class LoginView extends javax.swing.JFrame {
         LoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String password = new String(PassText.getPassword());
                 boolean Success = viewModel.login(
                         UsernameText.getText(),
-                        PassText.getText()
+                        password
                 );
                 if (Success==true){
                     //REMOVE OptionPane to redirect to Main Page
-                    JOptionPane.showMessageDialog(LoginView.this,"Login Successful");
+                    Navigator.showProduct();
                 }else {
                     JOptionPane.showMessageDialog(LoginView.this,"Login Invalid");
                 }

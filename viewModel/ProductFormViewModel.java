@@ -27,7 +27,6 @@ public class ProductFormViewModel {
     }
 
     public String save(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,int Category,int[] Subcategory,int[] suppliers){
-        boolean Invalid = false;
         ArrayList<Product> products = productdao.getProduct();
         if (ProductName == null || ProductName.isEmpty()) {
             for (int i = 0; i < products.size(); i++) {

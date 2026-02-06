@@ -14,10 +14,10 @@ public class UserDAO {
     public User findByUsername(String username) {
 
         String sql = """
-            SELECT u.user_id,u.username,u.password,u.role,p.name,p.email,p.status,p.address,p.contact
-            FROM Users u
-            JOIN Person p ON u.user_id = p.person_id
-            WHERE u.username = ?
+            SELECT u.UserID,u.Username,u.Password,u.Role,p.Name,p.Email,p.Status,p.Address,p.Contact
+            FROM user u
+            JOIN person p ON u.UserID = p.PersonID
+            WHERE u.Username = ?
         """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,15 +27,15 @@ public class UserDAO {
 
             if (rs.next()) {
                 return new User(
-                        rs.getInt("user_id"),
-                        rs.getString("username"),
-                        rs.getString("role"),
-                        rs.getString("password"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("status"),
-                        rs.getString("contact"),
-                        rs.getString("address")
+                        rs.getInt("u.UserID"),
+                        rs.getString("u.Username"),
+                        rs.getString("u.Role"),
+                        rs.getString("u.Password"),
+                        rs.getString("p.Name"),
+                        rs.getString("p.Email"),
+                        rs.getString("p.Status"),
+                        rs.getString("p.Contact"),
+                        rs.getString("p.Address")
                 );
             }
 
@@ -49,12 +49,12 @@ public class UserDAO {
     public void insert(User r) {
 
         String insertPerson = """
-            INSERT INTO Person (name, email, contact, address, status)
+            INSERT INTO person (Name, Email, Contact, Address, Status)
             VALUES (?, ?, ?, ?, ?)
         """;
 
         String insertUser = """
-            INSERT INTO Users (user_id, username, password, role)
+            INSERT INTO user (UserID, Username, Password, Role)
             VALUES (?, ?, ?, ?)
         """;
 
@@ -98,9 +98,9 @@ public class UserDAO {
 
         String sql = """
             DELETE p
-            FROM Person p
-            JOIN Users u ON p.person_id = u.user_id
-            WHERE u.username = ?
+            FROM person p
+            JOIN user u ON p.PersonID = u.UserID
+            WHERE u.Username = ?
         """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

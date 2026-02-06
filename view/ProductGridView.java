@@ -31,16 +31,15 @@ public class ProductGridView extends JPanel {
             card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             card.setBackground(Color.WHITE);
             card.setPreferredSize(new Dimension(220, 170));
-// sa ti problem la mo fini drece li ban ancine function pa ti exister
+
             JLabel idLabel     = new JLabel("ID: " + p.getProductId());
             JLabel nameLabel   = new JLabel("Name: " + p.getProductName());
             JLabel priceLabel  = new JLabel("Price: $" + p.getUnitPrice());
             JLabel statusLabel = new JLabel("Status: " + p.getProductStatus());
             JLabel genderLabel = new JLabel("Gender: " + p.getGender());
-
+            //Implement Image using file provided from DB
             idLabel.setFont(fontBold);
             nameLabel.setFont(fontBold);
-
             card.add(idLabel);
             card.add(nameLabel);
             card.add(priceLabel);

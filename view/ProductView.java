@@ -1,17 +1,23 @@
 package view;
 
+import DAO.ProductDAO;
+import database.DBConnection;
 import model.Product;
 import utilities.TopBarFactory;
 import view.components.SideMenuBar;
+import viewModel.ProductViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
-// BEERBUL TO MET TO ProductFormViewModel la mo fini drece naming convection dan ProductGrid
+import java.util.Objects;
+
 public class ProductView extends JFrame {
 
     private final ProductViewModel viewModel;
-
+    private List<Product> products;
     private JPanel MainPanel = new JPanel(new BorderLayout());
     private ProductGridView productGridView = new ProductGridView();
     private TopBarFactory topBar;
@@ -19,6 +25,9 @@ public class ProductView extends JFrame {
     public ProductView(ProductViewModel viewModel) {
         this.viewModel = viewModel;
         initComponents();
+    }
+    private void loadProducts(List<Product> products) {
+        productGridView.loadProducts(products);
     }
 
     private void initComponents() {
@@ -38,52 +47,64 @@ public class ProductView extends JFrame {
                 new String[]{
                         "Sort by ID",
                         "Sort by Name",
-                        "Sort by Category",
-                        "Sort by Price",
-                        "Sort by Quantity"
+                        "Sort by Price"
                 }
         );
 
         MainPanel.add(topBar, BorderLayout.NORTH);
         MainPanel.add(productGridView, BorderLayout.CENTER);
         add(MainPanel);
-
-        loadProducts(viewModel.getProducts());
+        products = viewModel.getProducts();
+        loadProducts(products);
         setupActions();
     }
 
-    private void loadProducts(List<Product> products) {
-        productGridView.loadProducts(products);
-    }
 
     private void setupActions() {
-        //Bour to ggt viewmodel so ban functions ici la ein
+
 
         topBar.btnAdd.addActionListener(e -> {
-            viewModel.addProduct();
-            loadProducts(viewModel.getProducts());
+            //viewModel.addProduct();
         });
 
-        topBar.btnUpdate.addActionListener(e -> {
-            viewModel.updateProduct();
-            loadProducts(viewModel.getProducts());
-        });
+        //topBar.btnUpdate.addActionListener(e -> {
+
+            //viewModel.updateProduct();
+
+        //});
 
         topBar.btnDelete.addActionListener(e -> {
-            viewModel.deleteProduct();
+            //DELETE Product
+            //viewModel.deleteProduct();
             loadProducts(viewModel.getProducts());
         });
 
         topBar.btnSearch.addActionListener(e -> {
             String keyword = topBar.txtSearch.getText();
-            String sortBy  = (String) topBar.cmbSort.getSelectedItem();
-            loadProducts(viewModel.searchAndSortProducts(keyword, sortBy));
+            if (Objects.equals(keyword, "")){
+                products= viewModel.getProducts();
+            }else{
+                products=viewModel.searchProducts(keyword);
+                int index = topBar.cmbSort.getSelectedIndex();
+                if (index==-1){
+                    loadProducts(viewModel.sortProducts(index,products));
+                }
+            }
+            loadProducts(products);
+
+        });
+        topBar.cmbSort.addActionListener(e -> {
+            int index = topBar.cmbSort.getSelectedIndex();
+            loadProducts(viewModel.sortProducts(index,products));
         });
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() ->
-                new ProductView(new ProductViewModel()).setVisible(true)
-        );
+    public static void main(String[] args) throws SQLException {
+        Connection conn= DBConnection.getConnection();
+        ProductDAO dao = new ProductDAO(conn);
+        ProductViewModel pvm = new ProductViewModel(dao);
+       SwingUtilities.invokeLater(() ->
+                new ProductView(pvm).setVisible(true)
+       );
     }
 }

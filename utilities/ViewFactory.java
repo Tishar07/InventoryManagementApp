@@ -5,9 +5,11 @@ import DAO.ProductDAO;
 import database.DBConnection;
 import view.LoginView;
 import view.ProductFormView;
+import view.ProductView;
 import view.RegisterView;
 import viewModel.LoginViewModel;
 import viewModel.ProductFormViewModel;
+import viewModel.ProductViewModel;
 import viewModel.RegistrationViewModel;
 
 import java.sql.Connection;
@@ -43,6 +45,11 @@ public class ViewFactory {
     public static ProductFormView createProductFormView () {
         ProductFormViewModel viewModel = new ProductFormViewModel(productDAO);
         return new ProductFormView(viewModel);
+    }
+
+    public static ProductView createProductView () {
+        ProductViewModel viewModel = new ProductViewModel(productDAO);
+        return new ProductView(viewModel);
     }
 
 

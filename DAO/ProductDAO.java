@@ -13,27 +13,8 @@ public class ProductDAO {
         this.conn= conn;
     }
 
-    public ArrayList<Category> getCategory() {
-        ArrayList<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, CategoryName FROM category";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                categories.add(
-                        new Category(rs.getInt("CategoryID"),
-                        rs.getString("CategoryName")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return categories;
-    }
-
-    public ArrayList<Product> getProduct()  {
+    public ArrayList<Product> RunSqlProduct(String sql){
         ArrayList<Product> Product = new ArrayList<>();
-        String sql = "SELECT *" +
-                      "FROM product";
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -51,6 +32,63 @@ public class ProductDAO {
         }
         return Product;
     }
+    public ArrayList<Category> getCategory() {
+        ArrayList<Category> categories = new ArrayList<>();
+        String sql = "SELECT CategoryID, CategoryName FROM category";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                categories.add(
+                        new Category(rs.getInt("CategoryID"),
+                        rs.getString("CategoryName")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categories;
+    }
+    public ArrayList<Product> getProduct()  {
+        ArrayList<Product> Product = new ArrayList<>();
+        String sql = "SELECT *" +
+                      "FROM product";
+        Product = RunSqlProduct(sql);
+        return Product;
+    }
+    public ArrayList<Product> SortProduct(int sort)  {
+        ArrayList<Product> Product = new ArrayList<>();
+        String SortAttribute="";
+        String sql = "SELECT * " +
+                "FROM product "+
+                "ORDER BY "+SortAttribute+" ASC";
+        switch (sort){
+            case 0:
+                SortAttribute="ProductID";
+            case 1:
+                SortAttribute ="ProductName";
+            case 2:
+                SortAttribute="UnitPrice";
+            case 3:
+                sql="SELECT x.* " +
+                        "FROM Product x INNER join Stock z " +
+                        "ON x.ProductID = z.ProductID " +
+                        "ORDER BY z.QuantityAvailable ASC";
+            default:
+                sql = "SELECT *" +
+                        "FROM product";
+
+        }
+        Product = RunSqlProduct(sql);
+        return Product;
+    }
+
+    public ArrayList<Product> SearchProduct(String Keyword){
+        String sql = "SELECT * FROM Product WHERE ProductName LIKE '%" + Keyword + "%'";
+        ArrayList<Product> Product = new ArrayList<>();
+        Product= RunSqlProduct(sql);
+        return Product;
+    }
+
 
 
     public ArrayList<Subcategory> getSubCategory(String category) {
@@ -107,8 +145,6 @@ public class ProductDAO {
         }
         return suppliers;
     }
-
-
     public void save(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,int Category,int[] Subcategory,int[] supplier ){
         String sql = "INSERT INTO Product (ProductName, UnitPrice, ProductStatus, Gender, ImagePath) VALUES (?, ?, ?, ?, ?)";
         int productId=0 ;

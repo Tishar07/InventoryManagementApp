@@ -48,7 +48,6 @@ public class RegistrationViewModel {
             return "Password must contain uppercase, lowercase, number and symbol";
         }
 
-
         try {
             userdao.insert(r);
             return "Registration successful";

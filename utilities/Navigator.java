@@ -21,4 +21,9 @@ public class Navigator {
     public static void showRegister() {
         switchView(ViewFactory.createRegisterView());
     }
+
+    public static void showProduct() {
+        switchView(ViewFactory.createProductView());
+    }
+
 }
