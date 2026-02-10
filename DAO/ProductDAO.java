@@ -12,7 +12,6 @@ public class ProductDAO {
     public ProductDAO(Connection conn){
         this.conn= conn;
     }
-
     public ArrayList<Product> RunSqlProduct(String sql){
         ArrayList<Product> Product = new ArrayList<>();
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -81,16 +80,12 @@ public class ProductDAO {
         Product = RunSqlProduct(sql);
         return Product;
     }
-
     public ArrayList<Product> SearchProduct(String Keyword){
         String sql = "SELECT * FROM Product WHERE ProductName LIKE '%" + Keyword + "%'";
         ArrayList<Product> Product = new ArrayList<>();
         Product= RunSqlProduct(sql);
         return Product;
     }
-
-
-
     public ArrayList<Subcategory> getSubCategory(String category) {
         ArrayList<Subcategory> subCategories = new ArrayList<>();
         String CatSql = "SELECT CategoryID FROM Category WHERE CategoryName = ?";
@@ -197,5 +192,107 @@ public class ProductDAO {
         }
 
     }
+
+
+    //Fetch Existing Product
+    public Product getExistingProduct(int ProductID){
+        Product P= new Product(0,"",0.0,"","","");
+        String sql = " SELECT * FROM Product WHERE ProductID = ?";
+        try(PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ProductID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                int productId=rs.getInt("ProductID");
+                String productName=rs.getString("ProductName");
+                Double unitPrice=rs.getDouble("UnitPrice");
+                String productStatus=rs.getString("ProductStatus");
+                String gender=rs.getString("Gender");
+                String imagePath=rs.getString("ImagePath");
+                P = new Product(productId,productName,unitPrice,productStatus,gender,imagePath);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return P;
+    }
+    public Category getCategoryExistingProduct(int ProductID){
+        Category categorie=new Category(0,"");
+        int catId = 0;
+        String sql = "SELECT CategoryID FROM product_subcategory_category WHERE ProductID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ProductID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                catId = rs.getInt("CategoryID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String CatSql = "SELECT CategoryID, CategoryName FROM category WHERE CategoryID= ?";
+        try (PreparedStatement ps = conn.prepareStatement(CatSql)) {
+            ps.setInt(1, catId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                categorie = new Category(rs.getInt("CategoryID"), rs.getString("CategoryName"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return categorie;
+    }
+    public ArrayList<Subcategory> getSubCategoryExistingProduct(int productID) {
+        ArrayList<Subcategory> subCategories = new ArrayList<>();
+        String sql = """
+                SELECT psc.SubCategoryID,psc.CategoryID,ps.SubCategoryName
+                FROM product_subcategory_category psc
+                JOIN subcategory ps ON psc.SubCategoryID = ps.SubCategoryID
+                WHERE psc.ProductID = ? ;
+                """;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int subId = rs.getInt("psc.SubCategoryID");
+                    int catId = rs.getInt("psc.CategoryID");
+                    String name = rs.getString("ps.SubName");
+                    subCategories.add(new Subcategory(subId, catId, name));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subCategories;
+    }
+    public ArrayList<Supplier> getSupplierExistingProduct(int productID){
+        ArrayList<Supplier> suppliers = new ArrayList<>();
+        String sql= """
+                    SELECT p.*, x.SupplierID
+                    FROM person p
+                    JOIN supplier x
+                        ON p.PersonID = x.PersonID
+                    JOIN supplier_product z
+                        ON x.SupplierID = z.SupplierID
+                    WHERE z.ProductID = ?;
+                """;
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, productID);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                int id = rs.getInt("x.SupplierID");
+                String Name = rs.getString("p.Name");
+                String Email = rs.getString("p.Email");
+                String Contact = rs.getString("p.Contact");
+                String Address = rs.getString("p.Address");
+                String Status = rs.getString("p.Status");
+                suppliers.add(new Supplier(id,Name,Email,Contact,Address,Status));
+            }
+        }catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return suppliers;
+    }
+
 
 }

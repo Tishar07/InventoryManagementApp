@@ -13,19 +13,15 @@ public class ProductFormViewModel {
     public ProductFormViewModel(ProductDAO productdao){
         this.productdao = productdao;
     }
-
     public Category[] FetchCategory(){
         return productdao.getCategory().toArray(new Category[0]);
     }
-
     public Subcategory[] FetchSubcategory(String category){
         return productdao.getSubCategory(category).toArray(new Subcategory[0]);
     }
-
     public Supplier[] FetchSupplier(){
         return productdao.getSupplier().toArray(new Supplier[0]);
     }
-
     public String save(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,int Category,int[] Subcategory,int[] suppliers){
         ArrayList<Product> products = productdao.getProduct();
         if (ProductName == null || ProductName.isEmpty()) {
@@ -67,5 +63,19 @@ public class ProductFormViewModel {
 
     }
 
+    public Product FetchExistingProduct(int ProductID){
+        return productdao.getExistingProduct(ProductID);
+    }
+    public Category FetchCategoryExistingProduct(int productID){
+        return productdao.getCategoryExistingProduct(productID);
+    }
+
+    public Subcategory[] FetchSubcategory(int ProductID){
+        return productdao.getSubCategoryExistingProduct(ProductID).toArray(new Subcategory[0]);
+    }
+
+    public Supplier[] FetchSupplierExistingProduct(int ProductID){
+        return productdao.getSupplierExistingProduct(ProductID).toArray(new Supplier[0]);
+    }
 
 }

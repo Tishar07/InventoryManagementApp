@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class RegisterView extends JFrame {
+public class RegisterView extends JPanel {
     private RegistrationViewModel viewModel;
     JPanel leftPanel = new JPanel();
     JLabel brandingLabel = new JLabel("<html><center><font color='white' size='6'>LOGO<br>NAME</font></center></html>");
@@ -40,10 +40,7 @@ public class RegisterView extends JFrame {
 
     public void initComponents() {
         //SET JFrame
-        setTitle("Registration Form");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+
         setLayout(new BorderLayout());
 
 

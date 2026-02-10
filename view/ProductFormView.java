@@ -1,11 +1,14 @@
 package view;
 
+import DAO.ProductDAO;
+import database.DBConnection;
 import model.Category;
 import model.Subcategory;
 import model.Supplier;
 import utilities.*;
 import view.components.SideMenuBar;
 import viewModel.ProductFormViewModel;
+import viewModel.ProductViewModel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -15,13 +18,15 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
 
 
-public class ProductFormView extends JFrame{
+public class ProductFormView extends JPanel{
     private ProductFormViewModel viewModel;
     view.components.SideMenuBar skeleton = new SideMenuBar();
     GridBagLayout Layout = new GridBagLayout();
@@ -100,12 +105,17 @@ public class ProductFormView extends JFrame{
         initComponents();
     }
 
+    public ProductFormView(ProductFormViewModel ViewModel,int ProductID){
+        this.viewModel=ViewModel;
+        skeleton.SideBarInt();
+        initComponents();
+        SaveBtn.setText("Update");
+        FetchDetails();
+    }
+    //Create Mode
     public void initComponents() {
-
-        // Frame
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        setLayout(new BorderLayout());
+        JPanel pagePanel = new JPanel(new BorderLayout());
         // Main Form Panel
         Form = skeleton.getMainPanel();
         Form.setLayout(new GridBagLayout());
@@ -330,8 +340,16 @@ public class ProductFormView extends JFrame{
         gbc.gridy++;
         gbc.weighty = 1;
         Form.add(Box.createVerticalGlue(), gbc);
+
+        JScrollPane scrollPane = new JScrollPane(Form);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        pagePanel.add(skeleton, BorderLayout.WEST);
+        pagePanel.add(scrollPane, BorderLayout.CENTER);
+        add(pagePanel, BorderLayout.CENTER);
+
         Actions();
-        setContentPane(skeleton);
 
     }
     public String[] InitCategoryCombo(){
@@ -601,6 +619,22 @@ public class ProductFormView extends JFrame{
         });
 
 
+
+    }
+
+    // Edit/View Mode
+    public void FetchDetails(){
+
+    }
+
+    public static void main(String[] args) throws SQLException {
+        Connection conn= DBConnection.getConnection();
+        ProductDAO dao = new ProductDAO(conn);
+        ProductFormViewModel pvm = new ProductFormViewModel(dao);
+        ProductFormView pv =new ProductFormView(pvm);
+        JFrame test = new JFrame();
+        test.add(pv);
+        test.setVisible(true);
 
     }
 

@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class LoginView extends javax.swing.JFrame {
+public class LoginView extends JPanel  {
     private LoginViewModel viewModel;
     JPanel MainPanel = new JPanel();
     JPanel LeftPanel = new JPanel();
@@ -31,12 +31,6 @@ public class LoginView extends javax.swing.JFrame {
     }
 
     private void initComponents() {
-        //SET JFrame Properties
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("LOGIN");
-        setLocationRelativeTo(null);
-        setResizable(true);
 
 
         //SET Panel Layout Manager
@@ -108,6 +102,7 @@ public class LoginView extends javax.swing.JFrame {
         MainPanel.add(RightPanel, BorderLayout.CENTER);
 
         Actions();
+        setLayout(new BorderLayout());
         add(MainPanel);
     }
 

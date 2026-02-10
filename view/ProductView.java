@@ -3,6 +3,7 @@ package view;
 import DAO.ProductDAO;
 import database.DBConnection;
 import model.Product;
+import utilities.Navigator;
 import utilities.TopBarFactory;
 import view.components.SideMenuBar;
 import viewModel.ProductViewModel;
@@ -14,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-public class ProductView extends JFrame {
+public class ProductView extends JPanel {
 
     private final ProductViewModel viewModel;
     private List<Product> products;
@@ -32,10 +33,8 @@ public class ProductView extends JFrame {
 
     private void initComponents() {
 
-        setTitle("PRODUCT");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        setLayout(new BorderLayout());
         // Side menu
         SideMenuBar sideMenu = new SideMenuBar();
         sideMenu.SideBarInt();
@@ -53,7 +52,8 @@ public class ProductView extends JFrame {
 
         MainPanel.add(topBar, BorderLayout.NORTH);
         MainPanel.add(productGridView, BorderLayout.CENTER);
-        add(MainPanel);
+
+        add(MainPanel, BorderLayout.CENTER);
         products = viewModel.getProducts();
         loadProducts(products);
         setupActions();
@@ -64,7 +64,7 @@ public class ProductView extends JFrame {
 
 
         topBar.btnAdd.addActionListener(e -> {
-            //viewModel.addProduct();
+            Navigator.showProductFrom();
         });
 
         //topBar.btnUpdate.addActionListener(e -> {

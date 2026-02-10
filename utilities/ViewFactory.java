@@ -52,7 +52,4 @@ public class ViewFactory {
         return new ProductView(viewModel);
     }
 
-
-
-
 }

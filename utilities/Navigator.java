@@ -1,29 +1,29 @@
 package utilities;
 
-import javax.swing.JFrame;
-
+import view.components.MainFrame;
+import javax.swing.JPanel;
 public class Navigator {
 
-    private static JFrame currentView;
-
-    private static void switchView(JFrame newView) {
-        if (currentView != null) {
-            currentView.dispose();
-        }
-        currentView = newView;
-        currentView.setVisible(true);
+    private static MainFrame frame;
+    public static void init(MainFrame mainFrame) {
+        frame = mainFrame;
     }
 
     public static void showLogin() {
-        switchView(ViewFactory.createLoginView());
+        frame.showPanel(ViewFactory.createLoginView());
     }
 
     public static void showRegister() {
-        switchView(ViewFactory.createRegisterView());
+        frame.showPanel(ViewFactory.createRegisterView());
     }
 
     public static void showProduct() {
-        switchView(ViewFactory.createProductView());
+        frame.showPanel(ViewFactory.createProductView());
+    }
+
+    public static void showProductFrom() {
+        frame.showPanel(ViewFactory.createProductFormView());
     }
 
 }
+
