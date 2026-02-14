@@ -1,5 +1,7 @@
 package view.components;
 
+import utilities.Navigator;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -60,17 +62,23 @@ public class SideMenuBar extends  JPanel{
                     //SET Direction
                     switch (IconItem.getText()){
                         case "Dashboard":
-                            //Redirect to Dashboard
+                            Navigator.showDashboard();
+                            break;
                         case "User":
                             //Redirect to User
+                            break;
                         case "Product":
-                            //Redirect to Product
+                            Navigator.showProduct();
+                            break;
                         case "Supplier" :
                             //Redirect to Supplier
+                            break;
                         case "Retailer" :
                             //Redirect to Retailer
+                            break;
                         case "Transaction" :
                             //Redirect to Transaction
+                            break;
                     }
                 }
 

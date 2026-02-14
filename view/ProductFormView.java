@@ -3,16 +3,18 @@ package view;
 import DAO.ProductDAO;
 import database.DBConnection;
 import model.Category;
+import model.Product;
 import model.Subcategory;
 import model.Supplier;
 import utilities.*;
 import view.components.SideMenuBar;
 import viewModel.ProductFormViewModel;
-import viewModel.ProductViewModel;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+
+import java.util.ArrayList;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
@@ -29,7 +30,6 @@ import java.util.Objects;
 public class ProductFormView extends JPanel{
     private ProductFormViewModel viewModel;
     view.components.SideMenuBar skeleton = new SideMenuBar();
-    GridBagLayout Layout = new GridBagLayout();
     GridBagConstraints gbc = new GridBagConstraints();
     Category[] categoryData;
     Subcategory[] SubcategoryData;
@@ -97,22 +97,28 @@ public class ProductFormView extends JPanel{
     JButton CancelBtn = ButtonFactory.createButtonPlain();
     JButton SaveBtn = ButtonFactory.createButtonPlain();
 
+    int productID;
+    Boolean EditMode=false;
+    String CategorySelected;
 
-
+    //Create Mode
     public ProductFormView(ProductFormViewModel ViewModel){
         this.viewModel=ViewModel;
         skeleton.SideBarInt();
         initComponents();
     }
 
+    //Create View/Edit
     public ProductFormView(ProductFormViewModel ViewModel,int ProductID){
+        EditMode=true;
+        productID = ProductID;
         this.viewModel=ViewModel;
         skeleton.SideBarInt();
         initComponents();
         SaveBtn.setText("Update");
         FetchDetails();
     }
-    //Create Mode
+
     public void initComponents() {
         setLayout(new BorderLayout());
         JPanel pagePanel = new JPanel(new BorderLayout());
@@ -222,7 +228,7 @@ public class ProductFormView extends JPanel{
         String[] colCategory = {"Sub Category Selected"};
 
         //Data to Fetch
-        String[] SubCol = {"Subcatogery Selected"};
+        String[] SubCol = {"Subcategory Selected"};
         SubModel= new DefaultTableModel(SubCol,0);
         SubCategoryTable = new JTable(SubModel);
         SubCategoryTable.setRowHeight(30);
@@ -381,7 +387,7 @@ public class ProductFormView extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Change to Product main page
-                Navigator.showLogin();
+                Navigator.showProduct();
             }
         });
         CancelBtn.addActionListener(new ActionListener() {
@@ -394,16 +400,25 @@ public class ProductFormView extends JPanel{
         CategoryComboBox.addActionListener(e -> {
             String categoryName = (String) CategoryComboBox.getSelectedItem();
             String[] subCategories = InitSubCategoryCombo(categoryName);
-            SubModel.setRowCount(0);
+            if (EditMode==true || categoryName !=CategorySelected){
+                SubModel.setRowCount(0);
+            }
+            if (EditMode == true && categoryName==CategorySelected){
+                Subcategory[] s = viewModel.FetchSubcategory(productID);
+                for(Subcategory sub: s){
+                    SubModel.addRow(new Object[]{sub.getName()});
+                }
+            }
+
             SubCategoryComboBox.setModel(
                     new DefaultComboBoxModel<>(subCategories)
             );
+
         });
         SupplierTableAction();
         SubCategoryTableAction();
         UploadImage();
         Save();
-
     }
     public void SupplierTableAction(){
         SupplierAddBtn.addActionListener(new ActionListener() {
@@ -521,7 +536,6 @@ public class ProductFormView extends JPanel{
         });
     }
     public void Save(){
-
         SaveBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -597,45 +611,127 @@ public class ProductFormView extends JPanel{
                         }
                     }
                 }
-                String SaveStatus = viewModel.save(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier);
-                if (Objects.equals(SaveStatus, "Successfully Saved !")){
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Successfully Saved !",
-                            "Save Status",
-                            JOptionPane.PLAIN_MESSAGE
-                    );
+                if(EditMode==true){
+                    String UpdateStatus = viewModel.update(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier,productID);
+                    if (Objects.equals(UpdateStatus, "Successfully Updated !")){
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Successfully Saved !",
+                                "Update Status",
+                                JOptionPane.PLAIN_MESSAGE
+                        );
 
+                    }else{
+                        JOptionPane.showMessageDialog(
+                                null,
+                                UpdateStatus,
+                                "Update Unsuccessful",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
                 }else{
-                    JOptionPane.showMessageDialog(
-                            null,
-                            SaveStatus,
-                            "Save Unsuccessful",
-                            JOptionPane.ERROR_MESSAGE
-                    );
+                    String SaveStatus = viewModel.save(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier);
+                    if (Objects.equals(SaveStatus, "Successfully Saved !")){
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Successfully Saved !",
+                                "Save Status",
+                                JOptionPane.PLAIN_MESSAGE
+                        );
+
+                    }else{
+                        JOptionPane.showMessageDialog(
+                                null,
+                                SaveStatus,
+                                "Save Unsuccessful",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
                 }
 
             }
         });
 
-
-
     }
 
     // Edit/View Mode
     public void FetchDetails(){
+        FetchProduct_DetailsExisting();
+        FetchCategoryExisting();
+        FetchSubCategoryExisting();
+        FetchSupplierExisting();
+    }
+    public void FetchSubCategoryExisting(){
+        Subcategory[] s = viewModel.FetchSubcategory(productID);
+        for(Subcategory sub: s){
+            SubModel.addRow(new Object[]{sub.getName()});
+        }
+    }
+    public void FetchSupplierExisting(){
+        Supplier[] s = viewModel.FetchSupplierExistingProduct(productID);
+        for(Supplier sup: s){
+            SupplierModel.addRow(new Object[]{sup.getName()});
+        }
+    }
+    public void FetchCategoryExisting(){
+        Category c = viewModel.FetchCategoryExistingProduct(productID);
+        String value = c.getName();
+        for(int i =0 ; i<= categoryData.length-1;i++){
+            if (categoryData[i].getName().equals(value)){
+                CategoryComboBox.setSelectedIndex(i);
+                CategorySelected = categoryData[i].getName();
+                break;
+            }
+        }
+    }
+    public void FetchProduct_DetailsExisting(){
+        Product Existing = viewModel.FetchExistingProduct(productID);
+        ProductNameText.setText(Existing.getProductName());
+        UnitPriceField.setText(Existing.getUnitPrice().toString());
+        String status = Existing.getProductStatus();
+        switch (status){
+            case "Available":
+                StatusComboBox.setSelectedIndex(0);
+                break;
+            case "Unavailable":
+                StatusComboBox.setSelectedIndex(1);
+                break;
+        }
 
+        String gender = Existing.getGender();
+        switch (gender){
+            case "Male":
+                male.setSelected(true);
+                break;
+            case "Female":
+                female.setSelected(true);
+                break;
+            case "Unisex":
+                unisex.setSelected(true);
+                break;
+            default:
+                System.out.println("Invalid Gender Fetch From DB");
+                break;
+        }
+        PathImageFile=Existing.getImagePath();
+        ImageIcon imageIcon = new ImageIcon(PathImageFile);
+        int panelWidth = ImagePanel.getWidth() > 0 ? ImagePanel.getWidth() : 400;
+        int panelHeight = ImagePanel.getHeight() > 0 ? ImagePanel.getHeight() : 300;
+        Image scaledImage = imageIcon.getImage().getScaledInstance(panelWidth, panelHeight, Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(scaledImage);
+        imageLabel.setIcon(imageIcon);
+        ImagePanel.revalidate();
+        ImagePanel.repaint();
     }
 
     public static void main(String[] args) throws SQLException {
         Connection conn= DBConnection.getConnection();
         ProductDAO dao = new ProductDAO(conn);
         ProductFormViewModel pvm = new ProductFormViewModel(dao);
-        ProductFormView pv =new ProductFormView(pvm);
+        ProductFormView pv =new ProductFormView(pvm,8);
         JFrame test = new JFrame();
         test.add(pv);
         test.setVisible(true);
-
     }
 
 }

@@ -193,7 +193,6 @@ public class ProductDAO {
 
     }
 
-
     //Fetch Existing Product
     public Product getExistingProduct(int ProductID){
         Product P= new Product(0,"",0.0,"","","");
@@ -256,7 +255,7 @@ public class ProductDAO {
                 while (rs.next()) {
                     int subId = rs.getInt("psc.SubCategoryID");
                     int catId = rs.getInt("psc.CategoryID");
-                    String name = rs.getString("ps.SubName");
+                    String name = rs.getString("ps.SubCategoryName");
                     subCategories.add(new Subcategory(subId, catId, name));
                 }
             }
@@ -293,6 +292,90 @@ public class ProductDAO {
         }
         return suppliers;
     }
+    //Update Product
+    public void Update(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,int Category,int[] Subcategory,int[] supplier,int ProductID ){
+        //Update Product Table
+        String sql = "UPDATE product SET ProductName =?, UnitPrice =?,ProductStatus =?,Gender =? , ImagePath = ? WHERE ProductID = ?";
+        int productId=0 ;
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+            ps.setString(1, ProductName);
+            ps.setDouble(2, UnitPrice);
+            ps.setString(3, ProductStatus);
+            ps.setString(4, Gender);
+            ps.setString(5, ImagePath);
+            ps.setInt(6, ProductID);
+
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    productId = rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //Update product_subcategory_category Table
+        sql ="DELETE FROM product_subcategory_category WHERE ProductID=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+            ps.setInt(1, ProductID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        sql = "INSERT INTO product_subcategory_category (ProductID, SubcategoryID, CategoryID) " +
+                "VALUES(?,?,?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
+            if(ProductID!=0){
+                for (int i =0 ; i< Subcategory.length;i++) {
+                    ps.setInt(1, ProductID);
+                    ps.setInt(2, Subcategory[i]);
+                    ps.setInt(3, Category);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+        //Update supplier_product Table
+        sql = "DELETE FROM supplier_product WHERE SupplierID = ? AND ProductID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (ProductID != 0) {
+                for (int i = 0; i < supplier.length; i++) {
+                    ps.setInt(1, supplier[i]);
+                    ps.setInt(2, ProductID);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        sql = "INSERT INTO supplier_product (SupplierID, ProductID) " +
+                "VALUES(?,?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
+            if(ProductID!=0){
+                for (int i =0 ; i< supplier.length;i++) {
+                    ps.setInt(1, supplier[i]);
+                    ps.setInt(2, ProductID);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+    }
+
+
 
 
 }

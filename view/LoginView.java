@@ -117,8 +117,7 @@ public class LoginView extends JPanel  {
                         password
                 );
                 if (Success==true){
-                    //REMOVE OptionPane to redirect to Main Page
-                    Navigator.showProduct();
+                    Navigator.showDashboard();
                 }else {
                     JOptionPane.showMessageDialog(LoginView.this,"Login Invalid");
                 }

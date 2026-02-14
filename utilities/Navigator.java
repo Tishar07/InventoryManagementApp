@@ -1,7 +1,6 @@
 package utilities;
 
 import view.components.MainFrame;
-import javax.swing.JPanel;
 public class Navigator {
 
     private static MainFrame frame;
@@ -24,6 +23,11 @@ public class Navigator {
     public static void showProductFrom() {
         frame.showPanel(ViewFactory.createProductFormView());
     }
+
+    public static void showDashboard() {
+        frame.showPanel(ViewFactory.createDashboardView());
+    }
+
 
 }
 
