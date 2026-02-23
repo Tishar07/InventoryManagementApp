@@ -1,7 +1,6 @@
 package view;
 
-import DAO.ProductDAO;
-import database.DBConnection;
+
 import model.Category;
 import model.Product;
 import model.Subcategory;
@@ -9,19 +8,14 @@ import model.Supplier;
 import utilities.*;
 import view.components.SideMenuBar;
 import viewModel.ProductFormViewModel;
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-
 import java.util.ArrayList;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
@@ -45,7 +39,7 @@ public class ProductFormView extends JPanel{
 
     JPanel UnitPricePanel = new JPanel();
     JLabel UnitPriceLabel = LabelFactory.creatFormLabel();
-    JTextField UnitPriceField = new JTextField();
+    JTextField UnitPriceField = TextFieldFactory.createFormTextField();
 
     JPanel StatusPanel = new JPanel();
     JLabel StatusLabel = LabelFactory.creatFormLabel();
@@ -386,15 +380,13 @@ public class ProductFormView extends JPanel{
         BackBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Change to Product main page
                 Navigator.showProduct();
             }
         });
         CancelBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Change to Product main page
-                Navigator.showLogin();
+                Navigator.showProduct();
             }
         });
         CategoryComboBox.addActionListener(e -> {
@@ -724,14 +716,5 @@ public class ProductFormView extends JPanel{
         ImagePanel.repaint();
     }
 
-    public static void main(String[] args) throws SQLException {
-        Connection conn= DBConnection.getConnection();
-        ProductDAO dao = new ProductDAO(conn);
-        ProductFormViewModel pvm = new ProductFormViewModel(dao);
-        ProductFormView pv =new ProductFormView(pvm,8);
-        JFrame test = new JFrame();
-        test.add(pv);
-        test.setVisible(true);
-    }
 
 }

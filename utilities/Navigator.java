@@ -28,6 +28,18 @@ public class Navigator {
         frame.showPanel(ViewFactory.createDashboardView());
     }
 
+    public static void showRetailer() {
+        frame.showPanel(ViewFactory.createRetailerView());
+    }
+
+    public static void showRetailerForm(){
+        frame.showPanel(ViewFactory.createRetailerViewForm());
+    }
+
+    public static void showRetailerFormViewEdit(int RetailerID){
+        frame.showPanel(ViewFactory.createRetailerViewFormEditView(RetailerID));
+    }
+
 
 }
 

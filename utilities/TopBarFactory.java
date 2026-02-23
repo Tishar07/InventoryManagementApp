@@ -65,4 +65,31 @@ public class TopBarFactory extends JPanel {
         add(txtSearch);
         add(btnSearch);
     }
+
+    public JButton getBtnAdd() {
+        return btnAdd;
+    }
+
+    public JButton getBtnViewEdit() {
+        return btnViewEdit;
+    }
+
+    public JButton getBtnDelete() {
+        return btnDelete;
+    }
+
+    public JButton getBtnSearch() {
+        return btnSearch;
+    }
+
+    public JTextField getTxtSearch() {
+        return txtSearch;
+    }
+
+    public JComboBox<String> getCmbSort() {
+        return cmbSort;
+    }
+
+
+
 }

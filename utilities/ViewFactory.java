@@ -3,6 +3,7 @@ package utilities;
 
 import DAO.DashboardDAO;
 import DAO.ProductDAO;
+import DAO.RetailerDAO;
 import database.DBConnection;
 import view.*;
 import viewModel.*;
@@ -17,6 +18,7 @@ public class ViewFactory {
     private static UserDAO userDAO;
     private static ProductDAO productDAO;
     private static DashboardDAO dashboardDAO;
+    private static RetailerDAO retailerDAO;
 
     static {
         try {
@@ -24,6 +26,7 @@ public class ViewFactory {
             userDAO = new UserDAO(connection);
             productDAO = new ProductDAO(connection);
             dashboardDAO = new DashboardDAO(connection);
+            retailerDAO = new RetailerDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -54,4 +57,19 @@ public class ViewFactory {
         return  new DashboardView(viewModel);
     }
 
+    public static RetailerView createRetailerView(){
+        RetailerViewModel viewModel = new RetailerViewModel(retailerDAO);
+        return  new RetailerView(viewModel);
+    }
+
+    public static  RetailerFormView createRetailerViewForm(){
+        RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
+        return new RetailerFormView(viewModel);
+    }
+
+
+    public static  RetailerFormView createRetailerViewFormEditView(int RetailerID){
+        RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
+        return new RetailerFormView(viewModel,RetailerID);
+    }
 }
