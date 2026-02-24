@@ -71,7 +71,7 @@ public class SideMenuBar extends  JPanel{
                             Navigator.showProduct();
                             break;
                         case "Supplier" :
-                            //Redirect to Supplier
+                            Navigator.showSupplier();
                             break;
                         case "Retailer" :
                                 Navigator.showRetailer();

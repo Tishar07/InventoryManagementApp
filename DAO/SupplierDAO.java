@@ -1,86 +1,210 @@
 package DAO;
 
 import model.Supplier;
-import database.DBConnection;
+
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
 
 public class SupplierDAO {
 
-    public void addSupplier(Supplier supplier) throws SQLException {
-        String sql = "INSERT INTO suppliers (supplier_id, name, email, address, contact, status) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, supplier.getSupplierid());
-            stmt.setString(2, supplier.getName());
-            stmt.setString(3, supplier.getEmail());
-            stmt.setString(4, supplier.getAddress());
-            stmt.setString(5, supplier.getContact());
-            stmt.setString(6, supplier.getStatus());
-            stmt.executeUpdate();
-        }
+    private Connection conn;
+
+    public SupplierDAO(Connection conn) {
+        this.conn = conn;
     }
 
-    public Supplier getSupplierById(int id) throws SQLException {
-        String sql = "SELECT * FROM suppliers WHERE supplier_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+    public ArrayList<Supplier> getSupplier() {
+
+        ArrayList<Supplier> supplierList = new ArrayList<>();
+
+        String sql = """
+                SELECT s.SupplierID, p.Name, p.Email, p.Address, p.Contact, p.Status
+                FROM person p
+                INNER JOIN supplier s ON p.PersonID = s.PersonID
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Supplier s = new Supplier(
+                        rs.getInt("SupplierID"),
+                        rs.getString("Name"),
+                        rs.getString("Email"),
+                        rs.getString("Address"),
+                        rs.getString("Contact"),
+                        rs.getString("Status")
+                );
+                supplierList.add(s);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return supplierList;
+    }
+
+    public Supplier getExistingSupplier(int SupplierID) {
+
+        Supplier supplier = null;
+
+        String sql = """
+                SELECT s.SupplierID, p.Name, p.Email, p.Address, p.Contact, p.Status
+                FROM person p
+                INNER JOIN supplier s ON p.PersonID = s.PersonID
+                WHERE s.SupplierID = ?
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, SupplierID);
+            ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
-                return new Supplier(
-                        rs.getInt("supplier_id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("address"),
-                        rs.getString("contact"),
-                        rs.getString("status")
+                supplier = new Supplier(
+                        rs.getInt("SupplierID"),
+                        rs.getString("Name"),
+                        rs.getString("Email"),
+                        rs.getString("Address"),
+                        rs.getString("Contact"),
+                        rs.getString("Status")
                 );
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
+
+        return supplier;
     }
 
-    public List<Supplier> getAllSuppliers() throws SQLException {
-        List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT * FROM suppliers";
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+    public ArrayList<Supplier> searchSupplier(String value) {
+
+        ArrayList<Supplier> supplierList = new ArrayList<>();
+
+        String sql = """
+                SELECT s.SupplierID, p.Name, p.Email, p.Address, p.Contact, p.Status
+                FROM person p
+                INNER JOIN supplier s ON p.PersonID = s.PersonID
+                WHERE p.Name LIKE ?
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + value + "%");
+            ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
-                suppliers.add(new Supplier(
-                        rs.getInt("supplier_id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("address"),
-                        rs.getString("contact"),
-                        rs.getString("status")
-                ));
+                Supplier sup = new Supplier(
+                        rs.getInt("SupplierID"),
+                        rs.getString("Name"),
+                        rs.getString("Email"),
+                        rs.getString("Address"),
+                        rs.getString("Contact"),
+                        rs.getString("Status")
+                );
+                supplierList.add(sup);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return suppliers;
+
+        return supplierList;
     }
 
-    public void updateSupplier(Supplier supplier) throws SQLException {
-        String sql = "UPDATE suppliers SET name=?, email=?, address=?, contact=?, status=? WHERE supplier_id=?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, supplier.getName());
-            stmt.setString(2, supplier.getEmail());
-            stmt.setString(3, supplier.getAddress());
-            stmt.setString(4, supplier.getContact());
-            stmt.setString(5, supplier.getStatus());
-            stmt.setInt(6, supplier.getSupplierid());
-            stmt.executeUpdate();
+    public void save(String name, String email, String address,
+                     String contact, String status) {
+
+        String sql = """
+                INSERT INTO person (Name, Email, Address, Contact, Status)
+                VALUES (?,?,?,?,?)
+                """;
+
+        int personId = -1;
+
+        try (PreparedStatement ps =
+                     conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setString(3, address);
+            ps.setString(4, contact);
+            ps.setString(5, status);
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                personId = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        sql = "INSERT INTO supplier (PersonID) VALUES (?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, personId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public void deleteSupplier(int id) throws SQLException {
-        String sql = "DELETE FROM suppliers WHERE supplier_id=?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
+    public void update(int SupplierID, String name, String email,
+                       String address, String contact, String status) {
+
+        String sql = """
+                UPDATE person p
+                INNER JOIN supplier s ON p.PersonID = s.PersonID
+                SET
+                    p.Name = ?,
+                    p.Email = ?,
+                    p.Contact = ?,
+                    p.Address = ?,
+                    p.Status = ?
+                WHERE s.SupplierID = ?
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setString(3, contact);
+            ps.setString(4, address);
+            ps.setString(5, status);
+            ps.setInt(6, SupplierID);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // =========================
+    // DELETE SUPPLIER
+    // =========================
+    public void delete(int SupplierID) {
+
+        String sql = """
+                DELETE p
+                FROM person p
+                INNER JOIN supplier s ON s.PersonID = p.PersonID
+                WHERE s.SupplierID = ?
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, SupplierID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        sql = "DELETE FROM supplier WHERE SupplierID = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, SupplierID);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

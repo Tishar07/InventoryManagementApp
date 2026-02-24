@@ -4,6 +4,7 @@ package utilities;
 import DAO.DashboardDAO;
 import DAO.ProductDAO;
 import DAO.RetailerDAO;
+import DAO.SupplierDAO;
 import database.DBConnection;
 import view.*;
 import viewModel.*;
@@ -19,6 +20,8 @@ public class ViewFactory {
     private static ProductDAO productDAO;
     private static DashboardDAO dashboardDAO;
     private static RetailerDAO retailerDAO;
+    private static SupplierDAO supplierDAO;
+
 
     static {
         try {
@@ -27,6 +30,7 @@ public class ViewFactory {
             productDAO = new ProductDAO(connection);
             dashboardDAO = new DashboardDAO(connection);
             retailerDAO = new RetailerDAO(connection);
+            supplierDAO = new SupplierDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -47,10 +51,10 @@ public class ViewFactory {
         return new ProductFormView(viewModel);
     }
 
-    public static ProductView createProductView () {
-        ProductViewModel viewModel = new ProductViewModel(productDAO);
-        return new ProductView(viewModel);
-    }
+//    public static ProductView createProductView () {
+//        ProductViewModel viewModel = new ProductViewModel(productDAO);
+//        return new ProductView(viewModel);
+//    }
 
     public static DashboardView createDashboardView(){
         DashboardViewModel viewModel = new DashboardViewModel(dashboardDAO);
@@ -62,14 +66,23 @@ public class ViewFactory {
         return  new RetailerView(viewModel);
     }
 
+
     public static  RetailerFormView createRetailerViewForm(){
         RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
         return new RetailerFormView(viewModel);
     }
 
-
     public static  RetailerFormView createRetailerViewFormEditView(int RetailerID){
         RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
         return new RetailerFormView(viewModel,RetailerID);
+    }
+    public static SupplierView createSupplierView(){
+        SupplierViewModel viewModel = new SupplierViewModel(supplierDAO);
+        return new SupplierView(viewModel);
+    }
+
+    public static SupplierFormView createSupplierViewForm(){
+        SupplierFormViewModel viewModel = new SupplierFormViewModel(supplierDAO);
+        return new SupplierFormView(viewModel);
     }
 }

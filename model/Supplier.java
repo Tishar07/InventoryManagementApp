@@ -1,7 +1,7 @@
 package model;
 
 public class Supplier {
-    private int Supplierid;
+    private int SupplierID;
     private String name;
     private String email;
     private String address;
@@ -9,8 +9,8 @@ public class Supplier {
     private String status;
 
 
-    public Supplier (int Supplierid, String name, String email, String address, String contact, String status){
-       this.Supplierid = Supplierid;
+    public Supplier (int SupplierID, String name, String email, String address, String contact, String status){
+       this.SupplierID = SupplierID;
        this.name = name;
        this.email = email;
        this.address = address;
@@ -19,8 +19,13 @@ public class Supplier {
 
     }
 
-    public int getSupplierid() { return Supplierid; }
-    public void setSupplierid(int Supplierid) { this.Supplierid = Supplierid; }
+    public int getSupplierId() {
+        return SupplierID;
+    }
+
+    public void setSupplierId(int SupplierID) {
+        this.SupplierID = SupplierID;
+    }
 
     public String getName(){ return name; }
     public void setName(String name) {this.name = name; }

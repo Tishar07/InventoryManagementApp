@@ -597,7 +597,7 @@ public class ProductFormView extends JPanel{
                     String SupplierName = (String) SupplierModel.getValueAt(i, 0);
                     for (int j = 0; j < supplierData.length; j++) {
                         if (SupplierName.equals(supplierData[j].getName())) {
-                            SelectedSupplier[Supplierindex] = supplierData[j].getSupplierid();
+                            SelectedSupplier[Supplierindex] = supplierData[j].getSupplierId();
                             Supplierindex++;
                             break;
                         }

@@ -271,7 +271,6 @@ public class RetailerFormView extends JPanel {
                 }
             }
         });
-
     }
 
     public void FetchDetails(){
@@ -286,9 +285,5 @@ public class RetailerFormView extends JPanel {
         }else {
             StatusComboBox.setSelectedIndex(1);
         }
-
     }
-
-
-
 }

@@ -16,9 +16,9 @@ public class Navigator {
         frame.showPanel(ViewFactory.createRegisterView());
     }
 
-    public static void showProduct() {
-        frame.showPanel(ViewFactory.createProductView());
-    }
+//    public static void showProduct() {
+//        frame.showPanel(ViewFactory.createProductView());
+//    }
 
     public static void showProductFrom() {
         frame.showPanel(ViewFactory.createProductFormView());
@@ -40,6 +40,16 @@ public class Navigator {
         frame.showPanel(ViewFactory.createRetailerViewFormEditView(RetailerID));
     }
 
+    public static void showSupplier() {
+        frame.showPanel(ViewFactory.createSupplierView());
+    }
+
+    public static void showSupplierForm(){
+        frame.showPanel(ViewFactory.createSupplierViewForm());
+    }
+
+    public static void showSupplierFormViewEdit(int SupplierID){
+        frame.showPanel(ViewFactory.createSupplierViewFormEditView(SupplierID));
+    }
 
 }
-
