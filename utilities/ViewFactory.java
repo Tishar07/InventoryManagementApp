@@ -51,10 +51,10 @@ public class ViewFactory {
         return new ProductFormView(viewModel);
     }
 
-//    public static ProductView createProductView () {
-//        ProductViewModel viewModel = new ProductViewModel(productDAO);
-//        return new ProductView(viewModel);
-//    }
+    public static ProductView createProductView () {
+        ProductViewModel viewModel = new ProductViewModel(productDAO);
+        return new ProductView(viewModel);
+    }
 
     public static DashboardView createDashboardView(){
         DashboardViewModel viewModel = new DashboardViewModel(dashboardDAO);
