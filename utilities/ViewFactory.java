@@ -85,4 +85,9 @@ public class ViewFactory {
         SupplierFormViewModel viewModel = new SupplierFormViewModel(supplierDAO);
         return new SupplierFormView(viewModel);
     }
+
+    public static SupplierFormView createSupplierViewFormEditView(int SupplierID) {
+        SupplierFormViewModel viewModel = new SupplierFormViewModel(supplierDAO);
+        return new SupplierFormView(viewModel, SupplierID);
+    }
 }
