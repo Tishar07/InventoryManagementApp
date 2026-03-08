@@ -15,8 +15,9 @@ public class RetailerDAO {
         ArrayList<Retailer> RetailerList = new ArrayList<>();
         String sql = """
                 SELECT r.RetailerID , p.*
-                FROM person p INNER JOIN retailer r\s
-                ON p.personID = r.PersonID;
+                FROM person p INNER JOIN retailer r
+                ON p.personID = r.PersonID
+                WHERE p.Status='Active'
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
@@ -42,7 +43,7 @@ public class RetailerDAO {
                 SELECT r.RetailerID , p.*
                 FROM person p INNER JOIN retailer r
                 ON p.personID = r.PersonID
-                WHERE r.RetailerID = ?
+                WHERE r.RetailerID = ? AND p.Status='Active'
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1,RetailerID);
@@ -126,16 +127,14 @@ public class RetailerDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void delete(int RetailerID){
      String sql= """
-            DELETE p
-            FROM person p
-            INNER JOIN retailer r ON r.PersonID = p.PersonID
-            WHERE r.RetailerID = ?
+                UPDATE person p
+                INNER JOIN retailer r ON r.PersonID = p.PersonID
+                SET p.Status = 'Inactive'
+                WHERE r.RetailerID = ?;
             """;
      try(PreparedStatement ps = conn.prepareStatement(sql)){
          ps.setInt(1,RetailerID);
@@ -143,27 +142,23 @@ public class RetailerDAO {
      }catch (SQLException e){
          e.printStackTrace();
      }
-    sql= """
-        DELETE FROM retailer
-        WHERE RetailerID = ?
-        """;
-    try(PreparedStatement ps = conn.prepareStatement(sql)){
-        ps.setInt(1,RetailerID);
-        ps.executeUpdate();
-    }catch (SQLException e){
-        e.printStackTrace();
-    }
-
 
     }
 
     public ArrayList<Retailer> searchRetailer(String Value){
         ArrayList<Retailer> RetailerList = new ArrayList<>();
         String sql = """
-                SELECT r.RetailerID , p.*
-                FROM person p INNER JOIN retailer r
-                ON p.personID = r.PersonID
-                WHERE r.RetailerID = ? OR p.Name LIKE ? OR p.Email LIKE ? OR p.Contact LIKE ? OR p.Address LIKE ? OR p.Status LIKE ?
+                SELECT r.RetailerID, p.*
+                FROM person p
+                INNER JOIN retailer r ON p.PersonID = r.PersonID
+                WHERE p.Status = 'Active'
+                AND (
+                      r.RetailerID = ?
+                   OR p.Name LIKE CONCAT('%', ?, '%')
+                   OR p.Email LIKE CONCAT('%', ?, '%')
+                   OR p.Contact LIKE CONCAT('%', ?, '%')
+                   OR p.Address LIKE CONCAT('%', ?, '%')
+                );
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)) {
             if (isInteger(Value)&&Value.length()<=2) {
@@ -176,7 +171,7 @@ public class RetailerDAO {
             ps.setString(3, likeValue);
             ps.setString(4, likeValue);
             ps.setString(5, likeValue);
-            ps.setString(6, likeValue);
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 Retailer r = new Retailer(
@@ -185,7 +180,7 @@ public class RetailerDAO {
                         rs.getString("p.Email"),
                         rs.getString("p.Address"),
                         rs.getString("p.Contact"),
-                        rs.getString("p.Status"));
+                        "Active");
                 RetailerList.add(r);
             }
         } catch (SQLException e) {

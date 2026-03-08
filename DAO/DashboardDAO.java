@@ -1,7 +1,6 @@
 package DAO;
 
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -64,12 +63,12 @@ public class DashboardDAO {
         Map<String,Integer> CategoryStock = new HashMap<>();
         String sql= """
                 SELECT y.CategoryName,
-                       SUM(z.QuantityAvailable) AS TotalStock
+                       SUM(z.CurrentStock) AS TotalStock
                 FROM (
                         SELECT DISTINCT ProductID, CategoryID
                         FROM product_subcategory_category
                      ) x
-                INNER JOIN stock z
+                INNER JOIN stockstatus z
                     ON x.ProductID = z.ProductID
                 INNER JOIN category y
                     ON x.CategoryID = y.CategoryID
@@ -93,12 +92,12 @@ public class DashboardDAO {
 
         String sql= """
                 SELECT
-                    MONTHNAME(ChangeDate) AS Month,
-                    SUM(CASE WHEN ChangeType = 'IN' THEN QuantityType ELSE 0 END) AS `Total In`,
-                    SUM(CASE WHEN ChangeType = 'OUT' THEN QuantityType ELSE 0 END) AS `Total Out`
-                FROM StockHistory
-                GROUP BY MONTH(ChangeDate), MONTHNAME(ChangeDate)
-                ORDER BY MONTH(ChangeDate);
+                    MONTHNAME(ActionDate) AS Month,
+                    SUM(CASE WHEN TransactionType = 'SUPPLIER_IN' THEN Quantity ELSE 0 END) AS `Total In`,
+                    SUM(CASE WHEN TransactionType = 'RETAILER_OUT' THEN Quantity ELSE 0 END) AS `Total Out`
+                FROM stockhistory
+                GROUP BY MONTH(ActionDate), MONTHNAME(ActionDate)
+                ORDER BY MONTH(ActionDate);
                 """;
 
         try(PreparedStatement ps = conn.prepareStatement(sql)){

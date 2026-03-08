@@ -21,6 +21,7 @@ public class SupplierDAO {
                 SELECT s.SupplierID, p.Name, p.Email, p.Address, p.Contact, p.Status
                 FROM person p
                 INNER JOIN supplier s ON p.PersonID = s.PersonID
+                WHERE p.Status='Active'
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -52,7 +53,7 @@ public class SupplierDAO {
                 SELECT s.SupplierID, p.Name, p.Email, p.Address, p.Contact, p.Status
                 FROM person p
                 INNER JOIN supplier s ON p.PersonID = s.PersonID
-                WHERE s.SupplierID = ?
+                WHERE s.SupplierID = ? AND p.Status ='Active'
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -84,11 +85,29 @@ public class SupplierDAO {
                 SELECT s.SupplierID, p.Name, p.Email, p.Address, p.Contact, p.Status
                 FROM person p
                 INNER JOIN supplier s ON p.PersonID = s.PersonID
-                WHERE p.Name LIKE ?
+                WHERE p.Status = 'Active'
+                AND (
+                      s.SupplierID = ?
+                   OR p.Name LIKE CONCAT('%', ?, '%')
+                   OR p.Email LIKE CONCAT('%', ?, '%')
+                   OR p.Contact LIKE CONCAT('%', ?, '%')
+                   OR p.Address LIKE CONCAT('%', ?, '%')
+                );
                 """;
-
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + value + "%");
+
+            if (isInteger(value)) {
+                ps.setInt(1, Integer.parseInt(value));
+            } else {
+                ps.setNull(1, java.sql.Types.INTEGER);
+            }
+
+            String likeValue = "%" + value + "%";
+            ps.setString(2, likeValue);
+            ps.setString(3, likeValue);
+            ps.setString(4, likeValue);
+            ps.setString(5, likeValue);
+
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -98,19 +117,17 @@ public class SupplierDAO {
                         rs.getString("Email"),
                         rs.getString("Address"),
                         rs.getString("Contact"),
-                        rs.getString("Status")
+                        "Active"
                 );
                 supplierList.add(sup);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return supplierList;
     }
 
-    public void save(String name, String email, String address,
-                     String contact, String status) {
+    public void save(String name, String email, String address, String contact, String status) {
 
         String sql = """
                 INSERT INTO person (Name, Email, Address, Contact, Status)
@@ -118,7 +135,6 @@ public class SupplierDAO {
                 """;
 
         int personId = -1;
-
         try (PreparedStatement ps =
                      conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -148,8 +164,7 @@ public class SupplierDAO {
         }
     }
 
-    public void update(int SupplierID, String name, String email,
-                       String address, String contact, String status) {
+    public void update(int SupplierID, String name, String email, String address, String contact, String status) {
 
         String sql = """
                 UPDATE person p
@@ -179,18 +194,14 @@ public class SupplierDAO {
         }
     }
 
-    // =========================
-    // DELETE SUPPLIER
-    // =========================
     public void delete(int SupplierID) {
 
         String sql = """
-                DELETE p
-                FROM person p
+                UPDATE person p
                 INNER JOIN supplier s ON s.PersonID = p.PersonID
-                WHERE s.SupplierID = ?
+                SET p.Status = 'Active'
+                WHERE s.SupplierID = ?;
                 """;
-
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, SupplierID);
             ps.executeUpdate();
@@ -198,13 +209,16 @@ public class SupplierDAO {
             e.printStackTrace();
         }
 
-        sql = "DELETE FROM supplier WHERE SupplierID = ?";
+    }
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, SupplierID);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private boolean isInteger(String str) {
+        if (str == null || str.isEmpty()) return false;
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
+
 }

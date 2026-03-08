@@ -17,7 +17,6 @@ public class SideMenuBar extends  JPanel{
 
     public void SideBarInt(){
         setLayout(new BorderLayout());
-
         //SET Side menu Bar
         LeftPanel = new JPanel();
         LeftPanel.setLayout(new BoxLayout(LeftPanel,BoxLayout.Y_AXIS));
@@ -33,7 +32,10 @@ public class SideMenuBar extends  JPanel{
                 {"Product",Address+"Product.png"},
                 {"Supplier",Address+"Supplier.png"},
                 {"Retailer",Address+"Retailer.png"},
-                {"Transaction",Address+"Transaction.png"}
+                {"Stock Status",Address+"StockStatus.png"},
+                {"Stock In",Address+"StockIn.png"},
+                {"Stock out",Address+"StockOut.png"},
+                {"History",Address+"History.png"}
         };
 
         for (String[] sideMenuItem : SideMenuItems) {
@@ -76,12 +78,17 @@ public class SideMenuBar extends  JPanel{
                         case "Retailer" :
                                 Navigator.showRetailer();
                             break;
-                        case "Transaction" :
-                            //Redirect to Transaction
+                        case "Stock In" :
+                            //Navigate to stock In
+                            break;
+                        case "Stock Out" :
+                            //Navigate to stock out
+                            break;
+                        case "History" :
+                            //Navigate to stock History
                             break;
                     }
                 }
-
                 @Override
                 public void mouseEntered(MouseEvent e){
                     IconItem.setForeground(Color.black);
@@ -94,7 +101,6 @@ public class SideMenuBar extends  JPanel{
 
                 }
             });
-
             //Add to Icon Item to Panel
             LeftPanel.add(IconItem);
         }

@@ -49,17 +49,21 @@ public class ProductDAO {
     }
     public ArrayList<Product> getProduct()  {
         ArrayList<Product> Product = new ArrayList<>();
-        String sql = "SELECT *" +
-                      "FROM product";
+        String sql = """
+                      SELECT *
+                      FROM product
+                      WHERE ProductStatus= 'Available'""";
         Product = RunSqlProduct(sql);
         return Product;
     }
     public ArrayList<Product> SortProduct(int sort)  {
         ArrayList<Product> Product = new ArrayList<>();
         String SortAttribute="";
-        String sql = "SELECT * " +
-                "FROM product "+
-                "ORDER BY "+SortAttribute+" ASC";
+        String sql = """
+                SELECT * 
+                FROM product
+                WHERE ProductStatus='Available'
+                ORDER BY SortAttribute ASC """;
         switch (sort){
             case 0:
                 SortAttribute="ProductID";
@@ -68,20 +72,23 @@ public class ProductDAO {
             case 2:
                 SortAttribute="UnitPrice";
             case 3:
-                sql="SELECT x.* " +
-                        "FROM Product x INNER join Stock z " +
-                        "ON x.ProductID = z.ProductID " +
-                        "ORDER BY z.QuantityAvailable ASC";
+                sql="""
+                    SELECT x.* 
+                    FROM Product x INNER join Stock z 
+                    ON x.ProductID = z.ProductID#
+                    WHERE ProductStatus='Available'
+                    ORDER BY z.QuantityAvailable ASC """
+                    ;
             default:
-                sql = "SELECT *" +
-                        "FROM product";
-
+                sql = """
+                        SELECT * 
+                        "FROM product""";
         }
         Product = RunSqlProduct(sql);
         return Product;
     }
     public ArrayList<Product> SearchProduct(String Keyword){
-        String sql = "SELECT * FROM Product WHERE ProductName LIKE '%" + Keyword + "%'";
+        String sql = "SELECT * FROM Product WHERE ProductName LIKE '%" + Keyword + "%' AND ProductStatus='Available'";
         ArrayList<Product> Product = new ArrayList<>();
         Product= RunSqlProduct(sql);
         return Product;
@@ -121,9 +128,11 @@ public class ProductDAO {
     }
     public ArrayList<Supplier> getSupplier(){
         ArrayList<Supplier> suppliers = new ArrayList<>();
-        String sql= "SELECT x.SupplierID,z.Name,z.Email,z.Contact,z.Address,z.Status " +
-                    "FROM supplier x INNER JOIN person z " +
-                    "ON x.PersonID = z.PersonID";
+        String sql= """
+                    SELECT x.SupplierID,z.Name,z.Email,z.Contact,z.Address,z.Status
+                    FROM supplier x INNER JOIN person z
+                    ON x.PersonID = z.PersonID
+                    WHERE p.Status='Active'""";
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
@@ -273,7 +282,7 @@ public class ProductDAO {
                         ON p.PersonID = x.PersonID
                     JOIN supplier_product z
                         ON x.SupplierID = z.SupplierID
-                    WHERE z.ProductID = ?;
+                    WHERE z.ProductID = ? AND p.Status='Active';
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, productID);
