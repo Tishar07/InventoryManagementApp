@@ -139,30 +139,62 @@ public class RegisterView extends JPanel {
         RegisterBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 String username = userField.getText().trim();
                 String email = emailField.getText().trim();
                 String password = new String(passField.getPassword());
+                String confirmPassword = new String(confirmPassField.getPassword());
                 String contact = contactField.getText().trim();
                 String address = addressField.getText().trim();
 
-                String confirmPassword = new String(confirmPassField.getPassword());
                 if (!password.equals(confirmPassword)) {
-                    JOptionPane.showMessageDialog(RegisterView.this, "Passwords do not match!");
+                    JOptionPane.showMessageDialog(
+                            RegisterView.this,
+                            "Passwords do not match!",
+                            "Warning",
+                            JOptionPane.WARNING_MESSAGE
+                    );
                     return;
                 }
 
-                User user = new User(0, username, "User", password, username, email, "Active", address, contact);
-                String result = viewModel.registerUser(user);
-                JOptionPane.showMessageDialog(RegisterView.this, result);
+                User user = new User(
+                        0,
+                        username,
+                        "User",
+                        password,
+                        username,
+                        email,
+                        "Active",
+                        address,
+                        contact
+                );
 
-                if ("Registration successful".equals(result)) {
+                String result = viewModel.registerUser(user);
+
+                if(result.equals("Registration successful")){
+                    JOptionPane.showMessageDialog(
+                            RegisterView.this,
+                            result,
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
                     userField.setText("");
                     emailField.setText("");
                     contactField.setText("");
                     addressField.setText("");
                     passField.setText("");
                     confirmPassField.setText("");
+
                     Navigator.showLogin();
+
+                }else{
+                    JOptionPane.showMessageDialog(
+                            RegisterView.this,
+                            result,
+                            "Validation Error",
+                            JOptionPane.WARNING_MESSAGE
+                    );
                 }
             }
         });
