@@ -49,7 +49,7 @@ public class Navigator {
     }
 
     public static void showSupplierFormViewEdit(int SupplierID){
-//        frame.showPanel(ViewFactory.createSupplierViewFormEditView(SupplierID));
+        frame.showPanel(ViewFactory.createSupplierViewFormEditView(SupplierID));
     }
 
 }

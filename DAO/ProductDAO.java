@@ -132,7 +132,7 @@ public class ProductDAO {
                     SELECT x.SupplierID,z.Name,z.Email,z.Contact,z.Address,z.Status
                     FROM supplier x INNER JOIN person z
                     ON x.PersonID = z.PersonID
-                    WHERE p.Status='Active'""";
+                    WHERE z.Status='Active'""";
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
