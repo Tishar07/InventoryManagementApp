@@ -15,11 +15,12 @@ public class ProductView extends JPanel {
     private final ProductViewModel viewModel;
     private List<Product> products;
 
-    private final ProductGridView productGridView = new ProductGridView();
+    private ProductGridView productGridView;
     private TopBarFactory topBar;
 
     public ProductView(ProductViewModel viewModel) {
         this.viewModel = viewModel;
+        this.productGridView = new ProductGridView(viewModel);
         initializeUI();
     }
 

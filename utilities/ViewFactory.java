@@ -51,6 +51,11 @@ public class ViewFactory {
         return new ProductFormView(viewModel);
     }
 
+    public static ProductFormView createProductFormViewEdit (int ProductID) {
+        ProductFormViewModel viewModel = new ProductFormViewModel(productDAO);
+        return new ProductFormView(viewModel,ProductID);
+    }
+
     public static ProductView createProductView () {
         ProductViewModel viewModel = new ProductViewModel(productDAO);
         return new ProductView(viewModel);

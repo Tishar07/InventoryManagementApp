@@ -51,5 +51,10 @@ public class ProductViewModel {
         return Products;
     }
 
+    public String deleteProduct(int ProductID){
+        productDAO.delete(ProductID);
+        return "Deleted Successfully";
+    }
+
 
 }

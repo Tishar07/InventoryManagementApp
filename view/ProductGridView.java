@@ -1,18 +1,26 @@
 package view;
 
 import model.Product;
+import utilities.Navigator;
+import viewModel.ProductViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.List;
 
 public class ProductGridView extends JPanel {
 
     private final JPanel gridPanel;
+    private ProductViewModel viewModel ;
 
-    public ProductGridView() {
+    JButton viewBtn;
+    JButton deleteBtn;
 
+    public ProductGridView(ProductViewModel viewModel) {
+        this.viewModel= viewModel;
         setLayout(new BorderLayout());
         setBackground(new Color(235, 235, 235)); // softer page background
 
@@ -81,11 +89,9 @@ public class ProductGridView extends JPanel {
 
             if (imagePath != null && !imagePath.isEmpty()) {
 
-                URL url = getClass().getClassLoader().getResource(imagePath);
+                if (imagePath != null) {
 
-                if (url != null) {
-
-                    ImageIcon icon = new ImageIcon(url);
+                    ImageIcon icon = new ImageIcon(imagePath);
                     Image img = icon.getImage().getScaledInstance(
                             300,
                             280,
@@ -129,8 +135,29 @@ public class ProductGridView extends JPanel {
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         btnPanel.setBackground(Color.WHITE);
 
-        JButton viewBtn = new JButton("VIEW / UPDATE");
-        JButton deleteBtn = new JButton("DELETE");
+        viewBtn = new JButton("VIEW / UPDATE");
+        viewBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Navigator.showProductFormEditView(p.getProductId());
+            }
+        });
+        deleteBtn = new JButton("DELETE");
+        deleteBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String deleteResponse = viewModel.deleteProduct(p.getProductId());
+                JOptionPane.showMessageDialog(
+                        null,
+                        deleteResponse,
+                        "Delete Status",
+                        JOptionPane.INFORMATION_MESSAGE
+                        );
+                loadProducts(viewModel.getProducts());
+                gridPanel.revalidate();
+                gridPanel.repaint();
+            }
+        });
 
         Font btnFont = new Font("Segoe UI", Font.BOLD, 14);
         viewBtn.setFont(btnFont);

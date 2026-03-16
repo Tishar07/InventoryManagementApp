@@ -24,6 +24,10 @@ public class Navigator {
         frame.showPanel(ViewFactory.createProductFormView());
     }
 
+    public static void showProductFormEditView(int ProductID) {
+        frame.showPanel(ViewFactory.createProductFormViewEdit(ProductID));
+    }
+
     public static void showDashboard() {
         frame.showPanel(ViewFactory.createDashboardView());
     }

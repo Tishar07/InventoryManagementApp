@@ -384,7 +384,21 @@ public class ProductDAO {
 
     }
 
+    public void delete(int ProductID){
+        String sql= """
+                UPDATE product
+                SET ProductStatus = 'Unavailable'
+                WHERE ProductId = ?;
+                """;
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            if(ProductID > 0 ) {
+                ps.setInt(1, ProductID);
+                ps.executeUpdate();
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
 
-
+    }
 
 }
