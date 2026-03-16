@@ -13,7 +13,8 @@ import java.awt.event.ActionListener;
 public class RegisterView extends JPanel {
     private RegistrationViewModel viewModel;
     JPanel leftPanel = new JPanel();
-    JLabel brandingLabel = new JLabel("<html><center><font color='white' size='6'>LOGO<br>NAME</font></center></html>");
+    JLabel brandingLabel = new JLabel("IMS");
+    ImageIcon ImageLogo = new ImageIcon("assets/logo.png");
     JPanel rightPanel = new JPanel();
     GridBagConstraints gbc = new GridBagConstraints();
     JLabel title = new JLabel("REGISTER", SwingConstants.CENTER);
@@ -46,8 +47,14 @@ public class RegisterView extends JPanel {
 
         //Styling LeftPanel
         leftPanel.setBackground(new Color(30, 75, 176));
-        leftPanel.setPreferredSize(new Dimension(500, 500));
+        leftPanel.setPreferredSize(new Dimension(250,400));
         leftPanel.setLayout(new GridBagLayout());
+        brandingLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        brandingLabel.setForeground(Color.WHITE);
+        Image LogoResizeImage = ImageLogo.getImage();
+        LogoResizeImage = LogoResizeImage.getScaledInstance(150,150,Image.SCALE_SMOOTH);
+        ImageIcon newLogoimg = new ImageIcon(LogoResizeImage);
+        brandingLabel.setIcon(newLogoimg);
         leftPanel.add(brandingLabel);
 
         //Styling RightPanel

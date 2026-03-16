@@ -12,7 +12,8 @@ public class LoginView extends JPanel  {
     private LoginViewModel viewModel;
     JPanel MainPanel = new JPanel();
     JPanel LeftPanel = new JPanel();
-    JLabel LabelLogo = new JLabel("LOGO");
+    JLabel LabelLogo = new JLabel("IMS");
+    ImageIcon ImageLogo = new ImageIcon("assets/logo.png");
     JPanel RightPanel = new JPanel();
     JLabel LabelTitle = new JLabel("LOGIN");
     JLabel LabelUsername = new JLabel("Username: ");
@@ -42,6 +43,11 @@ public class LoginView extends JPanel  {
         LeftPanel.setLayout(new GridBagLayout());
         LabelLogo.setFont(new Font("Arial", Font.BOLD, 24));
         LabelLogo.setForeground(Color.WHITE);
+        Image LogoResizeImage = ImageLogo.getImage();
+        LogoResizeImage = LogoResizeImage.getScaledInstance(150,150,Image.SCALE_SMOOTH);
+        ImageIcon newLogoimg = new ImageIcon(LogoResizeImage);
+        LabelLogo.setIcon(newLogoimg);
+
         LeftPanel.add(LabelLogo);
 
         //Styling Right Panel
