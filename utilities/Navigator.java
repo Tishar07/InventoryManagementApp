@@ -56,4 +56,8 @@ public class Navigator {
         frame.showPanel(ViewFactory.createSupplierViewFormEditView(SupplierID));
     }
 
+    public static void showHistory() {
+        frame.showPanel(ViewFactory.createHistoryView());
+    }
+
 }

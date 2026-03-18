@@ -85,7 +85,7 @@ public class SideMenuBar extends  JPanel{
                             //Navigate to stock out
                             break;
                         case "History" :
-                            //Navigate to stock History
+                            Navigator.showHistory();
                             break;
                     }
                 }

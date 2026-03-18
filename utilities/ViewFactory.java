@@ -2,6 +2,7 @@ package utilities;
 
 
 import DAO.DashboardDAO;
+import DAO.HistoryDAO;
 import DAO.ProductDAO;
 import DAO.RetailerDAO;
 import DAO.SupplierDAO;
@@ -21,6 +22,7 @@ public class ViewFactory {
     private static DashboardDAO dashboardDAO;
     private static RetailerDAO retailerDAO;
     private static SupplierDAO supplierDAO;
+    private static HistoryDAO historyDAO;
 
 
     static {
@@ -31,6 +33,7 @@ public class ViewFactory {
             dashboardDAO = new DashboardDAO(connection);
             retailerDAO = new RetailerDAO(connection);
             supplierDAO = new SupplierDAO(connection);
+            historyDAO = new HistoryDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -81,6 +84,7 @@ public class ViewFactory {
         RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
         return new RetailerFormView(viewModel,RetailerID);
     }
+
     public static SupplierView createSupplierView(){
         SupplierViewModel viewModel = new SupplierViewModel(supplierDAO);
         return new SupplierView(viewModel);
@@ -95,4 +99,10 @@ public class ViewFactory {
         SupplierFormViewModel viewModel = new SupplierFormViewModel(supplierDAO);
         return new SupplierFormView(viewModel, SupplierID);
     }
+
+    public static HistoryView createHistoryView() {
+        HistoryViewModel viewModel = new HistoryViewModel(historyDAO);
+        return new HistoryView(viewModel);
+    }
+
 }
