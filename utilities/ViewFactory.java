@@ -6,6 +6,7 @@ import DAO.HistoryDAO;
 import DAO.ProductDAO;
 import DAO.RetailerDAO;
 import DAO.SupplierDAO;
+import DAO.StockOutDAO;
 import database.DBConnection;
 import view.*;
 import viewModel.*;
@@ -23,6 +24,7 @@ public class ViewFactory {
     private static RetailerDAO retailerDAO;
     private static SupplierDAO supplierDAO;
     private static HistoryDAO historyDAO;
+    private static StockOutDAO stockOutDAO;
 
 
     static {
@@ -34,6 +36,7 @@ public class ViewFactory {
             retailerDAO = new RetailerDAO(connection);
             supplierDAO = new SupplierDAO(connection);
             historyDAO = new HistoryDAO(connection);
+            stockOutDAO = new StockOutDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -104,5 +107,21 @@ public class ViewFactory {
         HistoryViewModel viewModel = new HistoryViewModel(historyDAO);
         return new HistoryView(viewModel);
     }
+    public static StockOutView createStockOutView() {
+        StockOutViewModel viewModel = new StockOutViewModel(stockOutDAO);
+        return new StockOutView(viewModel);
+    }
 
+    public static StockOutFormView createStockOutFormView() {
+        StockOutFormViewModel viewModel = new StockOutFormViewModel(stockOutDAO);
+        return new StockOutFormView(viewModel);
+    }
+
+    public static StockOutFormView createStockOutFormViewEdit(int TransactionID) {
+        StockOutFormViewModel viewModel = new StockOutFormViewModel(stockOutDAO);
+        return new StockOutFormView(viewModel, TransactionID);
+    }
 }
+
+
+

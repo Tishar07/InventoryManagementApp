@@ -60,4 +60,16 @@ public class Navigator {
         frame.showPanel(ViewFactory.createHistoryView());
     }
 
+    public static void showStockOut() {
+        frame.showPanel(ViewFactory.createStockOutView());
+    }
+
+    public static void showStockOutForm() {
+        frame.showPanel(ViewFactory.createStockOutFormView());
+    }
+
+    public static void showStockOutFormViewEdit(int TransactionID) {
+        frame.showPanel(ViewFactory.createStockOutFormViewEdit(TransactionID));
+    }
 }
+

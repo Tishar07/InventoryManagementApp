@@ -34,7 +34,7 @@ public class SideMenuBar extends  JPanel{
                 {"Retailer",Address+"Retailer.png"},
                 {"Stock Status",Address+"StockStatus.png"},
                 {"Stock In",Address+"StockIn.png"},
-                {"Stock out",Address+"StockOut.png"},
+                {"Stock Out",Address+"StockOut.png"},
                 {"History",Address+"History.png"}
         };
 
@@ -81,8 +81,8 @@ public class SideMenuBar extends  JPanel{
                         case "Stock In" :
                             //Navigate to stock In
                             break;
-                        case "Stock Out" :
-                            //Navigate to stock out
+                        case "Stock Out":
+                            Navigator.showStockOut();
                             break;
                         case "History" :
                             Navigator.showHistory();
