@@ -121,6 +121,11 @@ public class ViewFactory {
         StockOutFormViewModel viewModel = new StockOutFormViewModel(stockOutDAO);
         return new StockOutFormView(viewModel, TransactionID);
     }
+
+    public static UserFormView createUserFormEditView(String username) {
+        UserFormViewModel viewModel = new UserFormViewModel(userDAO);
+        return new UserFormView(viewModel,username);
+    }
 }
 
 

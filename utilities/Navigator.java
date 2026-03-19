@@ -71,5 +71,10 @@ public class Navigator {
     public static void showStockOutFormViewEdit(int TransactionID) {
         frame.showPanel(ViewFactory.createStockOutFormViewEdit(TransactionID));
     }
+
+    public static void showUserFormEdit() {
+        frame.showPanel(ViewFactory.createUserFormEditView(Session.getUsername()));
+    }
+
 }
 

@@ -67,7 +67,7 @@ public class SideMenuBar extends  JPanel{
                             Navigator.showDashboard();
                             break;
                         case "User":
-                            //Redirect to User
+                            Navigator.showUserFormEdit();
                             break;
                         case "Product":
                             Navigator.showProduct();

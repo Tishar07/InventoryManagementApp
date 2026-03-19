@@ -144,4 +144,48 @@ public class UserDAO {
         return  null;
     }
 
+    //EDIT USER
+    public void updateByUserID(int userID, String name, String newUsername, String email,
+                               String password, String contact, String address, String role) {
+
+        String updatePerson = """
+        UPDATE person
+        SET Name = ?, Email = ?, Contact = ?, Address = ?
+        WHERE PersonID = ?
+    """;
+
+        String updateUser = """
+        UPDATE user
+        SET Username = ?, Password = ?, Role = ?
+        WHERE UserID = ?
+    """;
+
+        try {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(updatePerson)) {
+                ps.setString(1, name);
+                ps.setString(2, email);
+                ps.setString(3, contact);
+                ps.setString(4, address);
+                ps.setInt(5, userID);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(updateUser)) {
+                ps.setString(1, newUsername);
+                ps.setString(2, password);
+                ps.setString(3, role);
+                ps.setInt(4, userID);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            throw new RuntimeException("Failed to update user", e);
+        }
+    }
+
 }
