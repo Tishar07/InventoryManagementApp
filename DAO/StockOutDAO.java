@@ -1,4 +1,3 @@
-// DAO/StockOutDAO.java
 package DAO;
 
 import model.Product;
@@ -15,22 +14,25 @@ public class StockOutDAO {
         this.conn = conn;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // FETCH ALL  (only RETAILER_OUT transactions)
-    // ─────────────────────────────────────────────────────────────
+    // ── Fetch all RETAILER_OUT and DISPOSED transactions ─────────
     public ArrayList<StockOut> getStockOut() {
         ArrayList<StockOut> list = new ArrayList<>();
         String sql = """
                 SELECT
-                    st.TransactionID, st.ProductID, pr.ProductName,
-                    st.RetailerID,    p.Name AS RetailerName,
-                    st.Quantity,      st.Status,
-                    st.Notes,         st.TransactionDate
+                    st.TransactionID,
+                    st.ProductID,   pr.ProductName,
+                    st.RetailerID,
+                    COALESCE(p.Name, '-') AS RetailerName,
+                    st.Quantity,
+                    st.TransactionType,
+                    st.Status,
+                    st.Notes,
+                    st.TransactionDate
                 FROM stocktransaction st
-                JOIN product  pr ON st.ProductID  = pr.ProductID
-                JOIN retailer r  ON st.RetailerID = r.RetailerID
-                JOIN person   p  ON r.PersonID    = p.PersonID
-                WHERE st.TransactionType = 'RETAILER_OUT'
+                JOIN product pr ON st.ProductID = pr.ProductID
+                LEFT JOIN retailer r ON st.RetailerID = r.RetailerID
+                LEFT JOIN person   p ON r.PersonID    = p.PersonID
+                WHERE st.TransactionType IN ('RETAILER_OUT', 'DISPOSED')
                 ORDER BY st.TransactionID DESC
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -42,22 +44,25 @@ public class StockOutDAO {
         return list;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // FETCH SINGLE RECORD FOR EDIT FORM
-    // ─────────────────────────────────────────────────────────────
+    // ── Fetch single record ───────────────────────────────────────
     public StockOut getExistingStockOut(int transactionId) {
         String sql = """
                 SELECT
-                    st.TransactionID, st.ProductID, pr.ProductName,
-                    st.RetailerID,    p.Name AS RetailerName,
-                    st.Quantity,      st.Status,
-                    st.Notes,         st.TransactionDate
+                    st.TransactionID,
+                    st.ProductID,   pr.ProductName,
+                    st.RetailerID,
+                    COALESCE(p.Name, '-') AS RetailerName,
+                    st.Quantity,
+                    st.TransactionType,
+                    st.Status,
+                    st.Notes,
+                    st.TransactionDate
                 FROM stocktransaction st
-                JOIN product  pr ON st.ProductID  = pr.ProductID
-                JOIN retailer r  ON st.RetailerID = r.RetailerID
-                JOIN person   p  ON r.PersonID    = p.PersonID
+                JOIN product pr ON st.ProductID = pr.ProductID
+                LEFT JOIN retailer r ON st.RetailerID = r.RetailerID
+                LEFT JOIN person   p ON r.PersonID    = p.PersonID
                 WHERE st.TransactionID = ?
-                  AND st.TransactionType = 'RETAILER_OUT'
+                  AND st.TransactionType IN ('RETAILER_OUT', 'DISPOSED')
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, transactionId);
@@ -69,26 +74,27 @@ public class StockOutDAO {
         return null;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // SAVE  — insert transaction + deduct stockstatus + log history
-    // ─────────────────────────────────────────────────────────────
-    public void save(int retailerId, int productId,
-                     int quantity, String status, String notes) {
+    // ── Save ─────────────────────────────────────────────────────
+    // retailerId = 0 when type is DISPOSED
+    public void save(int retailerId, int productId, int quantity,
+                     String transactionType, String status, String notes) {
 
         // 1. Insert into stocktransaction
         int transactionId = 0;
         String insertTx = """
                 INSERT INTO stocktransaction
                     (ProductID, RetailerID, Quantity, TransactionType, Status, Notes)
-                VALUES (?, ?, ?, 'RETAILER_OUT', ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
         try (PreparedStatement ps =
                      conn.prepareStatement(insertTx, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, productId);
-            ps.setInt(2, retailerId);
+            if (retailerId > 0) ps.setInt(2, retailerId);
+            else                ps.setNull(2, Types.INTEGER);
             ps.setInt(3, quantity);
-            ps.setString(4, status);
-            ps.setString(5, notes);
+            ps.setString(4, transactionType);
+            ps.setString(5, status);
+            ps.setString(6, notes);
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) transactionId = rs.getInt(1);
@@ -98,25 +104,26 @@ public class StockOutDAO {
             return;
         }
 
-        // 2. Deduct from stockstatus only when Completed
+        // 2. Deduct from Stock table only when Completed
         if (status.equals("Completed")) {
             deductStock(productId, quantity);
         }
 
-        // 3. Log to stockhistory
-        logHistory(transactionId, productId, retailerId, quantity, status);
+        // 3. Log — null previousStatus = new record
+        logHistory(transactionId, productId, retailerId,
+                quantity, transactionType, status, null);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // UPDATE  — adjust stockstatus based on old vs new status/qty
-    // ─────────────────────────────────────────────────────────────
+    // ── Update ───────────────────────────────────────────────────
     public void update(int transactionId, int retailerId, int productId,
-                       int quantity, String status, String notes) {
+                       int quantity, String transactionType,
+                       String status, String notes) {
 
         // 1. Fetch old values before update
-        int oldQty = 0;
-        int oldProductId = 0;
-        String oldStatus = "";
+        int    oldQty       = 0;
+        int    oldProductId = 0;
+        String oldStatus    = "";
+
         String fetchOld = """
                 SELECT Quantity, ProductID, Status
                 FROM stocktransaction
@@ -138,50 +145,59 @@ public class StockOutDAO {
         // 2. Update stocktransaction record
         String updateTx = """
                 UPDATE stocktransaction
-                SET RetailerID = ?, ProductID = ?,
-                    Quantity = ?, Status = ?, Notes = ?
+                SET RetailerID = ?, ProductID = ?, Quantity = ?,
+                    TransactionType = ?, Status = ?, Notes = ?
                 WHERE TransactionID = ?
                 """;
         try (PreparedStatement ps = conn.prepareStatement(updateTx)) {
-            ps.setInt(1, retailerId);
+            if (retailerId > 0) ps.setInt(1, retailerId);
+            else                ps.setNull(1, Types.INTEGER);
             ps.setInt(2, productId);
             ps.setInt(3, quantity);
-            ps.setString(4, status);
-            ps.setString(5, notes);
-            ps.setInt(6, transactionId);
+            ps.setString(4, transactionType);
+            ps.setString(5, status);
+            ps.setString(6, notes);
+            ps.setInt(7, transactionId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             return;
         }
 
-        // 3. Reverse old stock effect, apply new stock effect
-        //    Only "Completed" transactions affect stockstatus
-        if (oldStatus.equals("Completed")) {
-            restoreStock(oldProductId, oldQty);   // undo old deduction
-        }
-        if (status.equals("Completed")) {
-            deductStock(productId, quantity);      // apply new deduction
-        }
+        // 3. Adjust Stock table based on old vs new status
+        if (oldStatus.equals("Completed")) restoreStock(oldProductId, oldQty);
+        if (status.equals("Completed"))    deductStock(productId, quantity);
 
-        // 4. Log update to stockhistory
-        logHistory(transactionId, productId, retailerId, quantity, status);
+        // 4. Log with oldStatus so history shows exactly what changed
+        logHistory(transactionId, productId, retailerId,
+                quantity, transactionType, status, oldStatus);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // CANCEL  — soft delete by setting Status = 'Cancelled'
-    // ─────────────────────────────────────────────────────────────
+    // ── Cancel (soft delete) ─────────────────────────────────────
     public void cancel(int transactionId) {
-        // Fetch before cancelling
-        int qty = 0; int productId = 0; String currentStatus = "";
-        String fetchSql = "SELECT Quantity, ProductID, Status FROM stocktransaction WHERE TransactionID = ?";
+        int    qty             = 0;
+        int    productId       = 0;
+        int    retailerId      = 0;
+        String currentStatus   = "";
+        String transactionType = "";
+
+        String fetchSql = """
+                SELECT Quantity, ProductID, RetailerID, Status, TransactionType
+                FROM stocktransaction
+                WHERE TransactionID = ?
+                """;
         try (PreparedStatement ps = conn.prepareStatement(fetchSql)) {
             ps.setInt(1, transactionId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                qty           = rs.getInt("Quantity");
-                productId     = rs.getInt("ProductID");
-                currentStatus = rs.getString("Status");
+                qty             = rs.getInt("Quantity");
+                productId       = rs.getInt("ProductID");
+                currentStatus   = rs.getString("Status");
+                transactionType = rs.getString("TransactionType");
+
+                // Safely handle NULL RetailerID for DISPOSED
+                retailerId = rs.getInt("RetailerID");
+                if (rs.wasNull()) retailerId = 0;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -189,41 +205,48 @@ public class StockOutDAO {
         }
 
         // Restore stock only if it was previously Completed
-        if (currentStatus.equals("Completed")) {
-            restoreStock(productId, qty);
-        }
+        if (currentStatus.equals("Completed")) restoreStock(productId, qty);
 
-        // Soft cancel
-        String cancelSql = "UPDATE stocktransaction SET Status = 'Cancelled' WHERE TransactionID = ?";
-        try (PreparedStatement ps = conn.prepareStatement(cancelSql)) {
+        // Soft cancel — update status only, row stays in DB
+        String sql = "UPDATE stocktransaction SET Status = 'Cancelled' WHERE TransactionID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, transactionId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return;
         }
+
+        // Log the cancellation with previous status
+        logHistory(transactionId, productId, retailerId,
+                qty, transactionType, "Cancelled", currentStatus);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // SEARCH
-    // ─────────────────────────────────────────────────────────────
+    // ── Search ───────────────────────────────────────────────────
     public ArrayList<StockOut> searchStockOut(String value) {
         ArrayList<StockOut> list = new ArrayList<>();
         String sql = """
                 SELECT
-                    st.TransactionID, st.ProductID, pr.ProductName,
-                    st.RetailerID,    p.Name AS RetailerName,
-                    st.Quantity,      st.Status,
-                    st.Notes,         st.TransactionDate
+                    st.TransactionID,
+                    st.ProductID,   pr.ProductName,
+                    st.RetailerID,
+                    COALESCE(p.Name, '-') AS RetailerName,
+                    st.Quantity,
+                    st.TransactionType,
+                    st.Status,
+                    st.Notes,
+                    st.TransactionDate
                 FROM stocktransaction st
-                JOIN product  pr ON st.ProductID  = pr.ProductID
-                JOIN retailer r  ON st.RetailerID = r.RetailerID
-                JOIN person   p  ON r.PersonID    = p.PersonID
-                WHERE st.TransactionType = 'RETAILER_OUT'
+                JOIN product pr ON st.ProductID = pr.ProductID
+                LEFT JOIN retailer r ON st.RetailerID = r.RetailerID
+                LEFT JOIN person   p ON r.PersonID    = p.PersonID
+                WHERE st.TransactionType IN ('RETAILER_OUT', 'DISPOSED')
                 AND (
                       st.TransactionID = ?
-                   OR pr.ProductName  LIKE CONCAT('%', ?, '%')
-                   OR p.Name          LIKE CONCAT('%', ?, '%')
-                   OR st.Status       LIKE CONCAT('%', ?, '%')
+                   OR pr.ProductName        LIKE CONCAT('%', ?, '%')
+                   OR COALESCE(p.Name, '')  LIKE CONCAT('%', ?, '%')
+                   OR st.Status             LIKE CONCAT('%', ?, '%')
+                   OR st.TransactionType    LIKE CONCAT('%', ?, '%')
                 )
                 ORDER BY st.TransactionID DESC
                 """;
@@ -233,6 +256,7 @@ public class StockOutDAO {
             ps.setString(2, value);
             ps.setString(3, value);
             ps.setString(4, value);
+            ps.setString(5, value);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapRow(rs));
         } catch (SQLException e) {
@@ -241,9 +265,7 @@ public class StockOutDAO {
         return list;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // DROPDOWNS
-    // ─────────────────────────────────────────────────────────────
+    // ── Dropdowns ────────────────────────────────────────────────
     public ArrayList<Retailer> getRetailers() {
         ArrayList<Retailer> list = new ArrayList<>();
         String sql = """
@@ -294,16 +316,14 @@ public class StockOutDAO {
         return list;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // PRIVATE HELPERS
-    // ─────────────────────────────────────────────────────────────
+    // ── Private helpers ───────────────────────────────────────────
 
-    /** Reduce CurrentStock in stockstatus */
+    // Deduct from Stock table (correct table for your DB)
     private void deductStock(int productId, int quantity) {
         String sql = """
-                UPDATE stockstatus
-                SET CurrentStock = CurrentStock - ?,
-                    LastUpdated  = NOW()
+                UPDATE stock
+                SET QuantityAvailable = QuantityAvailable - ?,
+                    LastUpdatedDate   = CURDATE()
                 WHERE ProductID = ?
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -315,12 +335,12 @@ public class StockOutDAO {
         }
     }
 
-    /** Restore CurrentStock in stockstatus (used on cancel / update reversal) */
+    // Restore to Stock table (correct table for your DB)
     private void restoreStock(int productId, int quantity) {
         String sql = """
-                UPDATE stockstatus
-                SET CurrentStock = CurrentStock + ?,
-                    LastUpdated  = NOW()
+                UPDATE stock
+                SET QuantityAvailable = QuantityAvailable + ?,
+                    LastUpdatedDate   = CURDATE()
                 WHERE ProductID = ?
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -332,48 +352,74 @@ public class StockOutDAO {
         }
     }
 
-    /** Write a snapshot row into stockhistory */
+    // ── logHistory ────────────────────────────────────────────────
+    // previousStatus = null  → new record being created
+    // previousStatus = value → existing record being updated
     private void logHistory(int transactionId, int productId,
-                            int retailerId, int quantity, String status) {
-        // Resolve names for the snapshot columns
-        String productName  = "";
-        String retailerName = "";
+                            int retailerId,   int quantity,
+                            String transactionType, String newStatus,
+                            String previousStatus) {
 
-        String nameSql = """
-                SELECT pr.ProductName, p.Name AS RetailerName
-                FROM product  pr,
-                     retailer r
-                JOIN person p ON r.PersonID = p.PersonID
-                WHERE pr.ProductID  = ?
-                  AND r.RetailerID  = ?
-                """;
-        try (PreparedStatement ps = conn.prepareStatement(nameSql)) {
+        // Resolve product name
+        String productName = "";
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT ProductName FROM product WHERE ProductID = ?")) {
             ps.setInt(1, productId);
-            ps.setInt(2, retailerId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                productName  = rs.getString("ProductName");
-                retailerName = rs.getString("RetailerName");
-            }
+            if (rs.next()) productName = rs.getString("ProductName");
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        // Resolve retailer name — only for RETAILER_OUT
+        String retailerName = null;
+        if (retailerId > 0) {
+            try (PreparedStatement ps = conn.prepareStatement("""
+                    SELECT p.Name FROM person p
+                    JOIN retailer r ON r.PersonID = p.PersonID
+                    WHERE r.RetailerID = ?
+                    """)) {
+                ps.setInt(1, retailerId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) retailerName = rs.getString("Name");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Human-readable reason showing what changed
+        String reason;
+        if (previousStatus == null) {
+            reason = "Created with status: " + newStatus;
+        } else if (!previousStatus.equals(newStatus)) {
+            reason = "Status changed from " + previousStatus + " to " + newStatus;
+        } else {
+            reason = "Record updated — status unchanged: " + newStatus;
         }
 
         String insertHistory = """
                 INSERT INTO stockhistory
                     (TransactionID, ProductID, ProductName,
-                     RetailerID, RetailerName,
-                     Quantity, TransactionType, Status)
-                VALUES (?, ?, ?, ?, ?, ?, 'RETAILER_OUT', ?)
+                     SupplierID,    SupplierName,
+                     RetailerID,    RetailerName,
+                     Quantity,      TransactionType, Status)
+                VALUES (?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)
                 """;
         try (PreparedStatement ps = conn.prepareStatement(insertHistory)) {
             ps.setInt(1, transactionId);
             ps.setInt(2, productId);
             ps.setString(3, productName);
-            ps.setInt(4, retailerId);
-            ps.setString(5, retailerName);
+            if (retailerId > 0) {
+                ps.setInt(4, retailerId);
+                ps.setString(5, retailerName);
+            } else {
+                // DISPOSED — no retailer
+                ps.setNull(4, Types.INTEGER);
+                ps.setNull(5, Types.VARCHAR);
+            }
             ps.setInt(6, quantity);
-            ps.setString(7, status);
+            ps.setString(7, transactionType);
+            ps.setString(8, newStatus);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -381,13 +427,16 @@ public class StockOutDAO {
     }
 
     private StockOut mapRow(ResultSet rs) throws SQLException {
+        int retailerId = rs.getInt("RetailerID");
+        if (rs.wasNull()) retailerId = 0;
         return new StockOut(
                 rs.getInt("TransactionID"),
                 rs.getInt("ProductID"),
                 rs.getString("ProductName"),
-                rs.getInt("RetailerID"),
+                retailerId,
                 rs.getString("RetailerName"),
                 rs.getInt("Quantity"),
+                rs.getString("TransactionType"),
                 rs.getString("Status"),
                 rs.getString("Notes"),
                 rs.getTimestamp("TransactionDate") != null
