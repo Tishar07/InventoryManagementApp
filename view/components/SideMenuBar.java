@@ -79,7 +79,7 @@ public class SideMenuBar extends  JPanel{
                                 Navigator.showRetailer();
                             break;
                         case "Stock In" :
-                            //Navigate to stock In
+                            Navigator.showStockIn();
                             break;
                         case "Stock Out":
                             Navigator.showStockOut();

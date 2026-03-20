@@ -56,6 +56,17 @@ public class Navigator {
         frame.showPanel(ViewFactory.createSupplierViewFormEditView(SupplierID));
     }
 
+    public static void showStockIn(){
+        frame.showPanel(ViewFactory.createStockInView());
+    }
+    public static void showStockInForm(){
+        frame.showPanel(ViewFactory.createStockInFormView());
+    }
+    public static void showStockInFormEdit(int transactionID){
+        frame.showPanel(ViewFactory.createStockInFormViewEdit(transactionID));
+    }
+
+
     public static void showHistory() {
         frame.showPanel(ViewFactory.createHistoryView());
     }

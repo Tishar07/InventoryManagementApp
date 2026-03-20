@@ -1,6 +1,7 @@
 package utilities;
 
 
+import DAO.*;
 import DAO.DashboardDAO;
 import DAO.HistoryDAO;
 import DAO.ProductDAO;
@@ -13,7 +14,6 @@ import viewModel.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import DAO.UserDAO;
 
 public class ViewFactory {
 
@@ -25,6 +25,7 @@ public class ViewFactory {
     private static SupplierDAO supplierDAO;
     private static HistoryDAO historyDAO;
     private static StockOutDAO stockOutDAO;
+    private static StockInDAO stockInDAO;
 
 
     static {
@@ -35,6 +36,7 @@ public class ViewFactory {
             dashboardDAO = new DashboardDAO(connection);
             retailerDAO = new RetailerDAO(connection);
             supplierDAO = new SupplierDAO(connection);
+            stockInDAO = new StockInDAO(connection);
             historyDAO = new HistoryDAO(connection);
             stockOutDAO = new StockOutDAO(connection);
         } catch (SQLException e) {
@@ -52,48 +54,48 @@ public class ViewFactory {
         return new RegisterView(viewModel);
     }
 
-    public static ProductFormView createProductFormView () {
+    public static ProductFormView createProductFormView() {
         ProductFormViewModel viewModel = new ProductFormViewModel(productDAO);
         return new ProductFormView(viewModel);
     }
 
-    public static ProductFormView createProductFormViewEdit (int ProductID) {
+    public static ProductFormView createProductFormViewEdit(int ProductID) {
         ProductFormViewModel viewModel = new ProductFormViewModel(productDAO);
-        return new ProductFormView(viewModel,ProductID);
+        return new ProductFormView(viewModel, ProductID);
     }
 
-    public static ProductView createProductView () {
+    public static ProductView createProductView() {
         ProductViewModel viewModel = new ProductViewModel(productDAO);
         return new ProductView(viewModel);
     }
 
-    public static DashboardView createDashboardView(){
+    public static DashboardView createDashboardView() {
         DashboardViewModel viewModel = new DashboardViewModel(dashboardDAO);
-        return  new DashboardView(viewModel);
+        return new DashboardView(viewModel);
     }
 
-    public static RetailerView createRetailerView(){
+    public static RetailerView createRetailerView() {
         RetailerViewModel viewModel = new RetailerViewModel(retailerDAO);
-        return  new RetailerView(viewModel);
+        return new RetailerView(viewModel);
     }
 
 
-    public static  RetailerFormView createRetailerViewForm(){
+    public static RetailerFormView createRetailerViewForm() {
         RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
         return new RetailerFormView(viewModel);
     }
 
-    public static  RetailerFormView createRetailerViewFormEditView(int RetailerID){
+    public static RetailerFormView createRetailerViewFormEditView(int RetailerID) {
         RetailerFormViewModel viewModel = new RetailerFormViewModel(retailerDAO);
-        return new RetailerFormView(viewModel,RetailerID);
+        return new RetailerFormView(viewModel, RetailerID);
     }
 
-    public static SupplierView createSupplierView(){
+    public static SupplierView createSupplierView() {
         SupplierViewModel viewModel = new SupplierViewModel(supplierDAO);
         return new SupplierView(viewModel);
     }
 
-    public static SupplierFormView createSupplierViewForm(){
+    public static SupplierFormView createSupplierViewForm() {
         SupplierFormViewModel viewModel = new SupplierFormViewModel(supplierDAO);
         return new SupplierFormView(viewModel);
     }
@@ -103,14 +105,32 @@ public class ViewFactory {
         return new SupplierFormView(viewModel, SupplierID);
     }
 
+    public static StockInView createStockInView() {
+        StockInViewModel viewModel = new StockInViewModel(stockInDAO);
+        return new StockInView(viewModel);
+    }
+
+    public static StockInFormView createStockInFormView() {
+        StockInFormViewModel viewModel = new StockInFormViewModel(stockInDAO);
+        return new StockInFormView(viewModel);
+    }
+
+    public static StockInFormView createStockInFormViewEdit(int transactionID) {
+        StockInFormViewModel viewModel = new StockInFormViewModel(stockInDAO);
+        return new StockInFormView(viewModel, transactionID);
+    }
+
+
     public static HistoryView createHistoryView() {
         HistoryViewModel viewModel = new HistoryViewModel(historyDAO);
         return new HistoryView(viewModel);
     }
+
     public static StockOutView createStockOutView() {
         StockOutViewModel viewModel = new StockOutViewModel(stockOutDAO);
         return new StockOutView(viewModel);
     }
+
 
     public static StockOutFormView createStockOutFormView() {
         StockOutFormViewModel viewModel = new StockOutFormViewModel(stockOutDAO);

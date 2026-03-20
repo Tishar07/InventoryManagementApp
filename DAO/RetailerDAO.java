@@ -130,19 +130,18 @@ public class RetailerDAO {
     }
 
     public void delete(int RetailerID){
-     String sql= """
-                UPDATE person p
-                INNER JOIN retailer r ON r.PersonID = p.PersonID
-                SET p.Status = 'Inactive'
-                WHERE r.RetailerID = ?;
-            """;
-     try(PreparedStatement ps = conn.prepareStatement(sql)){
-         ps.setInt(1,RetailerID);
-         ps.executeUpdate();
-     }catch (SQLException e){
-         e.printStackTrace();
-     }
-
+         String sql= """
+                    UPDATE person p
+                    INNER JOIN retailer r ON r.PersonID = p.PersonID
+                    SET p.Status = 'Inactive'
+                    WHERE r.RetailerID = ?;
+                """;
+         try(PreparedStatement ps = conn.prepareStatement(sql)){
+             ps.setInt(1,RetailerID);
+             ps.executeUpdate();
+         }catch (SQLException e){
+             e.printStackTrace();
+         }
     }
 
     public ArrayList<Retailer> searchRetailer(String Value){
