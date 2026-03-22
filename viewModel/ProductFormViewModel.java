@@ -24,17 +24,20 @@ public class ProductFormViewModel {
     }
     public String save(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,int Category,int[] Subcategory,int[] suppliers){
         ArrayList<Product> products = productdao.getProduct();
-        if (ProductName == null || ProductName.isEmpty()) {
-            for (int i = 0; i < products.size(); i++) {
-                String input = ProductName.trim().toLowerCase();
-                String dbValue = products.get(i).getProductName().trim().toLowerCase();
-                if (dbValue.equals(input)){
-                    return "Product Name Already Exists !";
-                }
-            }
+
+        if (ProductName == null || ProductName.trim().isEmpty()) {
             return "Product Name is Empty !";
         }
-
+        if (!ProductName.matches("^[a-zA-Z0-9 ]+$")) {
+            return "Product Name contains invalid special characters!";
+        }
+        String input = ProductName.trim().toLowerCase();
+        for (Product p : products) {
+            String dbValue = p.getProductName().trim().toLowerCase();
+            if (dbValue.equals(input)) {
+                return "Product Name Already Exists !";
+            }
+        }
         if (UnitPrice==0.0||UnitPrice<0){
             return "Invalid Price";
         }
@@ -44,8 +47,11 @@ public class ProductFormViewModel {
         if(Objects.equals(Gender, "") || Gender == null){
             return "Gender Status Empty";
         }
-        if(Objects.equals(ImagePath, "") || ImagePath == null){
+        if (ImagePath == null || ImagePath.trim().isEmpty()) {
             return "Image Missing";
+        }
+        if (!ImagePath.matches(".*\\.(jpg|jpeg|png|gif)$")) {
+            return "Invalid image format!";
         }
         if (Category==-1) {
             return "Category Missing";
@@ -78,17 +84,25 @@ public class ProductFormViewModel {
         return productdao.getSupplierExistingProduct(ProductID).toArray(new Supplier[0]);
     }
 
-    public String update(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,int Category,int[] Subcategory,int[] suppliers,int productID){
+    public String update(String ProductName, Double UnitPrice,String ProductStatus,String Gender,String ImagePath,
+                         int Category,int[] Subcategory,int[] suppliers,int productID,String PrevProductName){
         ArrayList<Product> products = productdao.getProduct();
-        if (ProductName == null || ProductName.isEmpty()) {
-            for (int i = 0; i < products.size(); i++) {
-                String input = ProductName.trim().toLowerCase();
-                String dbValue = products.get(i).getProductName().trim().toLowerCase();
-                if (dbValue.equals(input)){
+
+        if (ProductName == null || ProductName.trim().isEmpty()) {
+            return "Product Name is Empty !";
+        }
+        if (!ProductName.matches("^[a-zA-Z0-9 ]+$")) {
+            return "Product Name contains invalid special characters!";
+        }
+
+        String input = ProductName.trim().toLowerCase();
+        if(!ProductName.equals(PrevProductName)){
+            for (Product p : products) {
+                String dbValue = p.getProductName().trim().toLowerCase();
+                if (dbValue.equals(input) ) {
                     return "Product Name Already Exists !";
                 }
             }
-            return "Product Name is Empty !";
         }
 
         if (UnitPrice==0.0||UnitPrice<0){
@@ -100,8 +114,11 @@ public class ProductFormViewModel {
         if(Objects.equals(Gender, "") || Gender == null){
             return "Gender Status Empty";
         }
-        if(Objects.equals(ImagePath, "") || ImagePath == null){
+        if (ImagePath == null || ImagePath.trim().isEmpty()) {
             return "Image Missing";
+        }
+        if (!ImagePath.matches(".*\\.(jpg|jpeg|png|gif)$")) {
+            return "Invalid image format!";
         }
         if (Category==-1) {
             return "Category Missing";

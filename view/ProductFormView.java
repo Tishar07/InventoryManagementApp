@@ -94,6 +94,7 @@ public class ProductFormView extends JPanel{
     int productID;
     Boolean EditMode=false;
     String CategorySelected;
+    String PreviousProductName;
 
     //Create Mode
     public ProductFormView(ProductFormViewModel ViewModel){
@@ -111,6 +112,7 @@ public class ProductFormView extends JPanel{
         initComponents();
         SaveBtn.setText("Update");
         FetchDetails();
+        PreviousProductName= ProductNameText.getText();
     }
 
     public void initComponents() {
@@ -604,7 +606,7 @@ public class ProductFormView extends JPanel{
                     }
                 }
                 if(EditMode==true){
-                    String UpdateStatus = viewModel.update(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier,productID);
+                    String UpdateStatus = viewModel.update(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier,productID,PreviousProductName);
                     if (Objects.equals(UpdateStatus, "Successfully Updated !")){
                         JOptionPane.showMessageDialog(
                                 null,
