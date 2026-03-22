@@ -1,4 +1,3 @@
-// viewModel/StockOutFormViewModel.java
 package viewModel;
 
 import DAO.StockOutDAO;
@@ -17,7 +16,6 @@ public class StockOutFormViewModel {
         this.stockOutDAO = stockOutDAO;
     }
 
-    // ── Dropdowns ────────────────────────────────────────────────
     public Object[][] FetchRetailers() {
         ArrayList<Retailer> list = stockOutDAO.getRetailers();
         Object[][] data = new Object[list.size()][2];
@@ -38,52 +36,82 @@ public class StockOutFormViewModel {
         return data;
     }
 
-    // ── Save ─────────────────────────────────────────────────────
-    public String save(int retailerId, int productId,
-                       String quantityStr, String status, String notes) {
+    // ── Save — retailerId = 0 for DISPOSED ───────────────────────
+    public String save(int retailerId, int productId, String quantityStr,
+                       String transactionType, String status, String notes) {
 
-        String err = validate(retailerId, productId, quantityStr, status);
+        String err = validate(retailerId, productId, quantityStr,
+                transactionType, status);
         if (err != null) return err;
 
         stockOutDAO.save(retailerId, productId,
-                Integer.parseInt(quantityStr.trim()), status,
+                Integer.parseInt(quantityStr.trim()),
+                transactionType, status,
                 notes == null ? "" : notes.trim());
         return "Saved Successfully";
     }
 
     // ── Update ───────────────────────────────────────────────────
     public String update(int transactionId, int retailerId, int productId,
-                         String quantityStr, String status, String notes) {
+                         String quantityStr, String transactionType,
+                         String status, String notes) {
 
-        String err = validate(retailerId, productId, quantityStr, status);
+        StockOut existing = stockOutDAO.getExistingStockOut(transactionId);
+        if (existing == null) return "Record not found";
+
+        String transitionError = validateStatusTransition(
+                existing.getStatus(), status);
+        if (transitionError != null) return transitionError;
+
+        String err = validate(retailerId, productId, quantityStr,
+                transactionType, status);
         if (err != null) return err;
 
         stockOutDAO.update(transactionId, retailerId, productId,
-                Integer.parseInt(quantityStr.trim()), status,
+                Integer.parseInt(quantityStr.trim()),
+                transactionType, status,
                 notes == null ? "" : notes.trim());
         return "Updated Successfully";
     }
 
-    // ── Fetch existing for edit form ─────────────────────────────
     public Map<String, String> FetchExistingStockOut(int transactionId) {
         StockOut s = stockOutDAO.getExistingStockOut(transactionId);
         Map<String, String> data = new HashMap<>();
         if (s == null) return data;
-        data.put("transactionId", String.valueOf(s.getTransactionId()));
-        data.put("retailerId",    String.valueOf(s.getRetailerId()));
-        data.put("retailerName",  s.getRetailerName());
-        data.put("productId",     String.valueOf(s.getProductId()));
-        data.put("productName",   s.getProductName());
-        data.put("quantity",      String.valueOf(s.getQuantity()));
-        data.put("status",        s.getStatus());
-        data.put("notes",         s.getNotes() != null ? s.getNotes() : "");
+        data.put("transactionId",   String.valueOf(s.getTransactionId()));
+        data.put("retailerId",      String.valueOf(s.getRetailerId()));
+        data.put("retailerName",    s.getRetailerName());
+        data.put("productId",       String.valueOf(s.getProductId()));
+        data.put("productName",     s.getProductName());
+        data.put("quantity",        String.valueOf(s.getQuantity()));
+        data.put("transactionType", s.getTransactionType());
+        data.put("status",          s.getStatus());
+        data.put("notes",           s.getNotes() != null ? s.getNotes() : "");
         return data;
+    }
+
+    // ── Status transition rules ───────────────────────────────────
+    private String validateStatusTransition(String current, String next) {
+        switch (current) {
+            case "Completed": return "A Completed stock out cannot be changed";
+            case "Cancelled": return "A Cancelled stock out cannot be changed";
+            case "Waiting":   return null; // any transition allowed
+            default:          return "Unknown status: " + current;
+        }
     }
 
     // ── Validation ───────────────────────────────────────────────
     private String validate(int retailerId, int productId,
-                            String quantityStr, String status) {
-        if (retailerId <= 0)
+                            String quantityStr, String transactionType,
+                            String status) {
+
+        if (transactionType == null ||
+                (!transactionType.equals("RETAILER_OUT") &&
+                        !transactionType.equals("DISPOSED")))
+            return "Please select a valid Type";
+
+        // Retailer only required for RETAILER_OUT
+        if (transactionType.equals("RETAILER_OUT") && retailerId <= 0)
             return "Please select a Retailer";
 
         if (productId <= 0)

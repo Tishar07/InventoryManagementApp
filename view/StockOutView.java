@@ -23,6 +23,7 @@ public class StockOutView extends JPanel {
     TopBarFactory topbar;
     JScrollPane TableScrollPane;
 
+    // ── First constructor needs a sortOptions array ───────────────
     String[] sortOptions = {"ID", "Retailer", "Product", "Quantity", "Status"};
     String[] columnNames = {"Transaction ID", "Retailer", "Product", "Quantity", "Status", "Notes", "Date"};
     Object[][] data;
@@ -41,6 +42,7 @@ public class StockOutView extends JPanel {
         StockOutLabel.setForeground(new Color(30, 75, 176));
         StockOutLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
 
+        // ── First constructor: all 4 buttons visible ──────────────
         topbar = new TopBarFactory("Search Stock Out:", sortOptions);
 
         HeaderPanel.setLayout(new BoxLayout(HeaderPanel, BoxLayout.Y_AXIS));
@@ -81,8 +83,10 @@ public class StockOutView extends JPanel {
 
     public void Actions() {
 
+        // ── Add ───────────────────────────────────────────────────
         topbar.getBtnAdd().addActionListener(e -> Navigator.showStockOutForm());
 
+        // ── Cancel (Delete button relabelled) ─────────────────────
         topbar.getBtnDelete().addActionListener(e -> {
             if (StockOutTable.getSelectedRow() == -1) {
                 JOptionPane.showMessageDialog(null,
@@ -96,29 +100,37 @@ public class StockOutView extends JPanel {
                         JOptionPane.WARNING_MESSAGE);
 
                 if (choice == JOptionPane.YES_OPTION) {
-                    int selectedRow = StockOutTable.getSelectedRow();
+                    int selectedRow   = StockOutTable.getSelectedRow();
                     int transactionId = (int) StockOutTable.getValueAt(selectedRow, 0);
-                    String message = viewModel.Cancel(transactionId);
-                    data = viewModel.FetchStockOuts();
-                    StockOutTableModel.setDataVector(data, columnNames);
-                    JOptionPane.showMessageDialog(null,
-                            message, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    String message    = viewModel.Cancel(transactionId);
+
+                    if (message.equals("Successfully Cancelled")) {
+                        data = viewModel.FetchStockOuts();
+                        StockOutTableModel.setDataVector(data, columnNames);
+                        JOptionPane.showMessageDialog(null,
+                                message, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                message, "Warning", JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             }
         });
 
+        // ── View / Edit ───────────────────────────────────────────
         topbar.getBtnViewEdit().addActionListener(e -> {
             if (StockOutTable.getSelectedRow() == -1) {
                 JOptionPane.showMessageDialog(null,
                         "Select a row to View/Edit!",
                         "Instruction", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                int selectedRow = StockOutTable.getSelectedRow();
+                int selectedRow   = StockOutTable.getSelectedRow();
                 int transactionId = (int) StockOutTable.getValueAt(selectedRow, 0);
                 Navigator.showStockOutFormViewEdit(transactionId);
             }
         });
 
+        // ── Search ────────────────────────────────────────────────
         topbar.getBtnSearch().addActionListener(e -> {
             String value = topbar.getTxtSearch().getText();
             if (value.isEmpty()) {
