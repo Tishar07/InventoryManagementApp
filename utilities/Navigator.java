@@ -87,5 +87,9 @@ public class Navigator {
         frame.showPanel(ViewFactory.createUserFormEditView(Session.getUsername()));
     }
 
+    public static void showStockStatus() {
+        frame.showPanel(ViewFactory.createStockStatusView());
+    }
+
 }
 

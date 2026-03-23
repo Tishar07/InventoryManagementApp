@@ -26,6 +26,8 @@ public class ViewFactory {
     private static HistoryDAO historyDAO;
     private static StockOutDAO stockOutDAO;
     private static StockInDAO stockInDAO;
+    private static StockStatusDAO stockStatusDAO;
+
 
 
     static {
@@ -39,6 +41,7 @@ public class ViewFactory {
             stockInDAO = new StockInDAO(connection);
             historyDAO = new HistoryDAO(connection);
             stockOutDAO = new StockOutDAO(connection);
+            stockStatusDAO = new StockStatusDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -146,6 +149,12 @@ public class ViewFactory {
         UserFormViewModel viewModel = new UserFormViewModel(userDAO);
         return new UserFormView(viewModel,username);
     }
+
+    public static StockStatusView createStockStatusView() {
+        StockStatusViewModel viewModel = new StockStatusViewModel(stockStatusDAO);
+        return new StockStatusView(viewModel);
+    }
+
 }
 
 

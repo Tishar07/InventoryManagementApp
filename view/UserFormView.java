@@ -31,10 +31,6 @@ public class UserFormView extends JPanel {
     JLabel EmailLabel = LabelFactory.creatFormLabel();
     JTextField EmailText = TextFieldFactory.createFormTextField();
 
-    JPanel ContactPanel = new JPanel();
-    JLabel ContactLabel = LabelFactory.creatFormLabel();
-    JTextField ContactText = TextFieldFactory.createFormTextField();
-
     JPanel AddressPanel = new JPanel();
     JLabel AddressLabel = LabelFactory.creatFormLabel();
     JTextField AddressText = TextFieldFactory.createFormTextField();
@@ -45,10 +41,6 @@ public class UserFormView extends JPanel {
     String[] RoleValues = {"Admin", "Staff"};
 
     // Change password part
-    JPanel CurrentPasswordPanel = new JPanel();
-    JLabel CurrentPasswordLabel = LabelFactory.creatFormLabel();
-    JPasswordField CurrentPasswordText = new JPasswordField();
-
     JPanel NewPasswordPanel = new JPanel();
     JLabel NewPasswordLabel = LabelFactory.creatFormLabel();
     JPasswordField NewPasswordText = new JPasswordField();
@@ -136,20 +128,6 @@ public class UserFormView extends JPanel {
         EmailPanel.add(EmailText);
         Form.add(EmailPanel, gbc);
 
-        // contact
-        gbc.gridy++;
-        ContactLabel.setText("Contact Number");
-        ContactLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        ContactPanel.setLayout(new BoxLayout(ContactPanel, BoxLayout.Y_AXIS));
-        ContactPanel.setBackground(Color.WHITE);
-        ContactPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        ContactText.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        ContactText.setAlignmentX(Component.LEFT_ALIGNMENT);
-        ContactPanel.add(ContactLabel);
-        ContactPanel.add(Box.createVerticalStrut(5));
-        ContactPanel.add(ContactText);
-        Form.add(ContactPanel, gbc);
-
         //Address
         gbc.gridy++;
         AddressLabel.setText("Address");
@@ -182,7 +160,7 @@ public class UserFormView extends JPanel {
         // change pw
         gbc.gridy++;
         JLabel ChangePwdTitle = new JLabel("Change Password");
-        ChangePwdTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        ChangePwdTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         ChangePwdTitle.setForeground(new Color(100, 100, 100));
         ChangePwdTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         JPanel DividerPanel = new JPanel();
@@ -195,20 +173,6 @@ public class UserFormView extends JPanel {
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         DividerPanel.add(separator);
         Form.add(DividerPanel, gbc);
-
-        // current pw
-        gbc.gridy++;
-        CurrentPasswordLabel.setText("Current Password");
-        CurrentPasswordLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        CurrentPasswordPanel.setLayout(new BoxLayout(CurrentPasswordPanel, BoxLayout.Y_AXIS));
-        CurrentPasswordPanel.setBackground(Color.WHITE);
-        CurrentPasswordPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        CurrentPasswordText.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        CurrentPasswordText.setAlignmentX(Component.LEFT_ALIGNMENT);
-        CurrentPasswordPanel.add(CurrentPasswordLabel);
-        CurrentPasswordPanel.add(Box.createVerticalStrut(5));
-        CurrentPasswordPanel.add(CurrentPasswordText);
-        Form.add(CurrentPasswordPanel, gbc);
 
         // new pw
         gbc.gridy++;
@@ -291,21 +255,18 @@ public class UserFormView extends JPanel {
                 String Name            = NameText.getText();
                 String NewUsername     = UsernameText.getText();
                 String Email           = EmailText.getText();
-                String Contact         = ContactText.getText();
                 String Address         = AddressText.getText();
                 String Role            = (String) RoleComboBox.getSelectedItem();
-                String CurrentPassword = new String(CurrentPasswordText.getPassword());
                 String NewPassword     = new String(NewPasswordText.getPassword());
                 String ConfirmPassword = new String(ConfirmPasswordText.getPassword());
 
                 String Message = viewModel.update(
                         Username, Name, NewUsername, Email,
-                        Contact, Address, Role,
-                        CurrentPassword, NewPassword, ConfirmPassword
+                        Address, Role,
+                        NewPassword, ConfirmPassword
                 );
 
                 if (Objects.equals(Message, "Updated Successfully")) {
-                    // Username may have changed — update reference
                     Username = NewUsername;
                     JOptionPane.showMessageDialog(
                             null, Message, "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -323,7 +284,6 @@ public class UserFormView extends JPanel {
         NameText.setText(data.get("name"));
         UsernameText.setText(data.get("username"));
         EmailText.setText(data.get("email"));
-        ContactText.setText(data.get("contact"));
         AddressText.setText(data.get("address"));
 
         if (Objects.equals(data.get("role"), "Admin")) {
@@ -331,6 +291,5 @@ public class UserFormView extends JPanel {
         } else {
             RoleComboBox.setSelectedIndex(1);
         }
-        // Password fields left blank onpurpose
     }
 }

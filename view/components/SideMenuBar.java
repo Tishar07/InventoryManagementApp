@@ -87,6 +87,9 @@ public class SideMenuBar extends  JPanel{
                         case "History" :
                             Navigator.showHistory();
                             break;
+                        case "Stock Status":
+                            Navigator.showStockStatus();
+                            break;
                     }
                 }
                 @Override

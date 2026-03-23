@@ -146,11 +146,11 @@ public class UserDAO {
 
     //EDIT USER
     public void updateByUserID(int userID, String name, String newUsername, String email,
-                               String password, String contact, String address, String role) {
+                               String password, String address, String role) {
 
         String updatePerson = """
         UPDATE person
-        SET Name = ?, Email = ?, Contact = ?, Address = ?
+        SET Name = ?, Email = ?, Address = ?
         WHERE PersonID = ?
     """;
 
@@ -166,9 +166,8 @@ public class UserDAO {
             try (PreparedStatement ps = conn.prepareStatement(updatePerson)) {
                 ps.setString(1, name);
                 ps.setString(2, email);
-                ps.setString(3, contact);
-                ps.setString(4, address);
-                ps.setInt(5, userID);
+                ps.setString(3, address);
+                ps.setInt(4, userID);
                 ps.executeUpdate();
             }
 
