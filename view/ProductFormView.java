@@ -606,7 +606,8 @@ public class ProductFormView extends JPanel{
                     }
                 }
                 if(EditMode==true){
-                    String UpdateStatus = viewModel.update(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier,productID,PreviousProductName);
+                    String UpdateStatus = viewModel.update(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile
+                            ,SelectedCategory,SelectedSubCat,SelectedSupplier,productID,PreviousProductName);
                     if (Objects.equals(UpdateStatus, "Successfully Updated !")){
                         JOptionPane.showMessageDialog(
                                 null,
@@ -624,7 +625,8 @@ public class ProductFormView extends JPanel{
                         );
                     }
                 }else{
-                    String SaveStatus = viewModel.save(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,SelectedCategory,SelectedSubCat,SelectedSupplier);
+                    String SaveStatus = viewModel.save(ProductName,UnitPriceNum,StatusStr,GenderValue,PathImageFile,
+                            SelectedCategory,SelectedSubCat,SelectedSupplier);
                     if (Objects.equals(SaveStatus, "Successfully Saved !")){
                         JOptionPane.showMessageDialog(
                                 null,

@@ -324,15 +324,7 @@ public class StockInFormView extends JPanel {
             }
         }
     }
-    public static void main(String[] args) throws SQLException {
-        Connection conn= DBConnection.getConnection();
-        StockInDAO dao = new StockInDAO(conn);
-        StockInFormViewModel pvm = new StockInFormViewModel(dao);
-        StockInFormView pv =new StockInFormView(pvm,17);
-        JFrame test = new JFrame();
-        test.add(pv);
-        test.setVisible(true);
-    }
+
 
 
 

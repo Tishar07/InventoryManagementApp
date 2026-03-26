@@ -19,11 +19,8 @@ public class PieChart extends JPanel {
 
     private Color generateColor(int index) {
         float hue = (float) ((index * GOLDEN_ANGLE) % 360) / 360f;
-
-        // Strong saturation & brightness (avoid pale colors)
-        float saturation = 0.75f;
-        float brightness = 0.85f;
-
+        float saturation = (index % 2 == 0) ? 0.90f : 0.60f;
+        float brightness  = (index % 3 == 0) ? 0.95f : (index % 3 == 1) ? 0.75f : 0.55f;
         return Color.getHSBColor(hue, saturation, brightness);
     }
 

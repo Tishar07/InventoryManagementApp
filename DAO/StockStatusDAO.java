@@ -18,6 +18,7 @@ public class StockStatusDAO {
                 SELECT ss.ProductID, p.ProductName, ss.CurrentStock
                 FROM stockstatus ss
                 JOIN product p ON ss.ProductID = p.ProductID
+                WHERE p.ProductStatus ='Available'
                 ORDER BY p.ProductName ASC
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

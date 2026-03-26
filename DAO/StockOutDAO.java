@@ -32,8 +32,8 @@ public class StockOutDAO {
                 JOIN product pr ON st.ProductID = pr.ProductID
                 LEFT JOIN retailer r ON st.RetailerID = r.RetailerID
                 LEFT JOIN person   p ON r.PersonID    = p.PersonID
-                WHERE st.TransactionType IN ('RETAILER_OUT', 'DISPOSED')
-                ORDER BY st.TransactionID DESC
+                WHERE st.TransactionType IN ('RETAILER_OUT', 'DISPOSED') AND p.Status='Active' AND pr.ProductStatus='Available'
+                ORDER BY st.TransactionID DESC;
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();

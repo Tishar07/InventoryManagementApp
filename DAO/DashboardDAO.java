@@ -19,10 +19,16 @@ public class DashboardDAO {
     public Map<String,Integer> getSubCategoryTotal(){
         Map<String,Integer> sub = new HashMap<>();
         String sql= """
-                SELECT z.SubCategoryName,COUNT(ProductID) AS TotalProducts
-                FROM product_subcategory_category x INNER JOIN subcategory z
-                ON x.SubCategoryID = z.SubCategoryID
-                GROUP BY z.SubCategoryName;
+                SELECT
+                    z.SubCategoryName,
+                    COUNT(y.ProductID) AS TotalProducts
+                FROM product_subcategory_category x
+                INNER JOIN subcategory z
+                    ON x.SubCategoryID = z.SubCategoryID
+                INNER JOIN product y
+                    ON x.ProductID = y.ProductID
+                WHERE y.ProductStatus = 'Available'
+                GROUP BY z.SubCategoryID, z.SubCategoryName;
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ResultSet rs = ps.executeQuery();
@@ -43,6 +49,7 @@ public class DashboardDAO {
                 SELECT z.Gender,COUNT(DISTINCT  x.ProductID) AS TotalGender
                 FROM product_subcategory_category x INNER JOIN product z
                 ON x.ProductID = z.ProductID
+                WHERE z.ProductStatus = 'Available'
                 GROUP BY z.Gender;
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)){
@@ -62,17 +69,21 @@ public class DashboardDAO {
     public Map<String,Integer> getCategoryTotal(){
         Map<String,Integer> CategoryStock = new HashMap<>();
         String sql= """
-                SELECT y.CategoryName,
-                       SUM(z.CurrentStock) AS TotalStock
+                SELECT
+                    y.CategoryName,
+                    SUM(z.CurrentStock) AS TotalStock
                 FROM (
                         SELECT DISTINCT ProductID, CategoryID
                         FROM product_subcategory_category
                      ) x
+                INNER JOIN product p
+                    ON x.ProductID = p.ProductID
                 INNER JOIN stockstatus z
                     ON x.ProductID = z.ProductID
                 INNER JOIN category y
                     ON x.CategoryID = y.CategoryID
-                GROUP BY y.CategoryName;
+                WHERE p.ProductStatus = 'Available'
+                GROUP BY y.CategoryID, y.CategoryName;
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ResultSet rs = ps.executeQuery();
@@ -96,6 +107,7 @@ public class DashboardDAO {
                     SUM(CASE WHEN TransactionType = 'SUPPLIER_IN' THEN Quantity ELSE 0 END) AS `Total In`,
                     SUM(CASE WHEN TransactionType = 'RETAILER_OUT' THEN Quantity ELSE 0 END) AS `Total Out`
                 FROM stockhistory
+                WHERE YEAR(ActionDate) = YEAR(CURDATE())
                 GROUP BY MONTH(ActionDate), MONTHNAME(ActionDate)
                 ORDER BY MONTH(ActionDate);
                 """;

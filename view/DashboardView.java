@@ -91,15 +91,21 @@ public class DashboardView extends JPanel {
 
         //Grouped Barchart Stock
         GroupedBarChart_StockPanel.setLayout(new BorderLayout());
-        StockLabel.setText("Stock Transaction Overview");
+        StockLabel.setText("Stock Movement Overview");
         Map<String, List<Integer>> Stockdata = viewModel.FetchStockPerMonthChange();
         String series1 = "Stock In";
         String series2 = "Stock Out";
-        int yInterval = 20;
-        GroupedBarChartPanel gb = new GroupedBarChartPanel(Stockdata,series1, series2, yInterval);
+        int totalIn  = Stockdata.values().stream().mapToInt(l -> l.get(0)).sum();
+        int totalOut = Stockdata.values().stream().mapToInt(l -> l.get(1)).sum();
+        int sum = Math.max(totalOut, totalIn);
+        double yInterval = Math.ceil(sum / 10.0 / Math.pow(10, Math.floor(Math.log10(sum / 10.0))))
+                * Math.pow(10, Math.floor(Math.log10(sum / 10.0)));;
+        int yint=(int) yInterval;
+        GroupedBarChartPanel gb = new GroupedBarChartPanel(Stockdata,series1, series2,yint);
         gb.setXAxisLabel("Month");
         gb.setYAxisLabel("Quantity");
         gb.setBackground(Color.white);
+        GroupedBarChart_StockPanel.add(StockLabel,BorderLayout.NORTH);
         GroupedBarChart_StockPanel.add(gb,BorderLayout.CENTER);
 
         PiechartPanel.setPreferredSize(new Dimension(800, 350));

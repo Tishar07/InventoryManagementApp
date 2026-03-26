@@ -199,7 +199,7 @@ public class SupplierDAO {
         String sql = """
                 UPDATE person p
                 INNER JOIN supplier s ON s.PersonID = p.PersonID
-                SET p.Status = 'Active'
+                SET p.Status = 'Inactive'
                 WHERE s.SupplierID = ?;
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

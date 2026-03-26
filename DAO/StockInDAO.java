@@ -24,7 +24,8 @@ public class StockInDAO {
                 INNER JOIN supplier y ON x.SupplierID = y.SupplierID
                 INNER JOIN person p ON p.PersonID = y.PersonID
                 INNER JOIN product v ON v.ProductID = x.ProductID
-                WHERE x.TransactionType = 'SUPPLIER_IN';
+                WHERE x.TransactionType = 'SUPPLIER_IN' AND p.Status='Active' AND v.ProductStatus ='Available'
+                ORDER BY x.TransactionID DESC;
                 """;
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ResultSet rs = ps.executeQuery();

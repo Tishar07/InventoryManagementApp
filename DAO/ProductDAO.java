@@ -60,10 +60,10 @@ public class ProductDAO {
         ArrayList<Product> Product = new ArrayList<>();
         String SortAttribute="";
         String sql = """
-                SELECT * 
+                SELECT *
                 FROM product
                 WHERE ProductStatus='Available'
-                ORDER BY SortAttribute ASC """;
+                ORDER BY SortAttribute ASC""";
         switch (sort){
             case 0:
                 SortAttribute="ProductID";
