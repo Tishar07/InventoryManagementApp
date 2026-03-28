@@ -29,12 +29,12 @@ public class StockOutFormView extends JPanel {
     // ── Retailer (hidden when DISPOSED) ─────────────────────────
     JPanel RetailerPanel = new JPanel();
     JLabel RetailerLabel = LabelFactory.creatFormLabel();
-    JComboBox<String> RetailerComboBox = new JComboBox<>();
+    JComboBox<String> RetailerComboBox = ComboBoxFactory.createFormComboBox(new String[]{});
     int[] retailerIds;
 
     JPanel ProductPanel = new JPanel();
     JLabel ProductLabel = LabelFactory.creatFormLabel();
-    JComboBox<String> ProductComboBox = new JComboBox<>();
+    JComboBox<String> ProductComboBox = ComboBoxFactory.createFormComboBox(new String[]{});
     int[] productIds;
 
     JPanel QuantityPanel = new JPanel();
