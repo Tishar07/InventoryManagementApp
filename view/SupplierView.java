@@ -29,7 +29,7 @@ public class SupplierView extends JPanel {
     String[] sortOptions = {"ID", "Name", "Email", "Status"};
     String[] columnNames = {
             "Supplier ID", "Supplier name", "Email",
-            "Contact number", "Status", "Product ID", "Stock Request"
+            "Contact number", "Status"
     };
 
     Object[][] data;
