@@ -35,10 +35,9 @@ public class UserFormView extends JPanel {
     JLabel AddressLabel = LabelFactory.creatFormLabel();
     JTextField AddressText = TextFieldFactory.createFormTextField();
 
-    JPanel RolePanel = new JPanel();
-    JLabel RoleLabel = LabelFactory.creatFormLabel();
-    JComboBox RoleComboBox;
-    String[] RoleValues = {"Admin", "Staff"};
+    JPanel ContactPanel = new JPanel();
+    JLabel ContactLabel = LabelFactory.creatFormLabel();
+    JTextField ContactText = TextFieldFactory.createFormTextField();
 
     // Change password part
     JPanel NewPasswordPanel = new JPanel();
@@ -100,7 +99,7 @@ public class UserFormView extends JPanel {
         NamePanel.add(NameText);
         Form.add(NamePanel, gbc);
 
-        //Username
+        // Username
         gbc.gridy++;
         UsernameLabel.setText("Username");
         UsernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -114,7 +113,7 @@ public class UserFormView extends JPanel {
         UsernamePanel.add(UsernameText);
         Form.add(UsernamePanel, gbc);
 
-        //Email
+        // Email
         gbc.gridy++;
         EmailLabel.setText("Email");
         EmailLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -128,7 +127,7 @@ public class UserFormView extends JPanel {
         EmailPanel.add(EmailText);
         Form.add(EmailPanel, gbc);
 
-        //Address
+        // Address
         gbc.gridy++;
         AddressLabel.setText("Address");
         AddressLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -142,20 +141,19 @@ public class UserFormView extends JPanel {
         AddressPanel.add(AddressText);
         Form.add(AddressPanel, gbc);
 
-        // role
+        // Contact
         gbc.gridy++;
-        RoleComboBox = ComboBoxFactory.createFormComboBox(RoleValues);
-        RoleLabel.setText("Role");
-        RoleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        RolePanel.setLayout(new BoxLayout(RolePanel, BoxLayout.Y_AXIS));
-        RolePanel.setBackground(Color.WHITE);
-        RolePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        RoleComboBox.setMaximumSize(new Dimension(300, 30));
-        RoleComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        RolePanel.add(RoleLabel);
-        RolePanel.add(Box.createVerticalStrut(5));
-        RolePanel.add(RoleComboBox);
-        Form.add(RolePanel, gbc);
+        ContactLabel.setText("Contact");
+        ContactLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ContactPanel.setLayout(new BoxLayout(ContactPanel, BoxLayout.Y_AXIS));
+        ContactPanel.setBackground(Color.WHITE);
+        ContactPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+        ContactText.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        ContactText.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ContactPanel.add(ContactLabel);
+        ContactPanel.add(Box.createVerticalStrut(5));
+        ContactPanel.add(ContactText);
+        Form.add(ContactPanel, gbc);
 
         // change pw
         gbc.gridy++;
@@ -256,13 +254,13 @@ public class UserFormView extends JPanel {
                 String NewUsername     = UsernameText.getText();
                 String Email           = EmailText.getText();
                 String Address         = AddressText.getText();
-                String Role            = (String) RoleComboBox.getSelectedItem();
+                String Contact         = ContactText.getText();
                 String NewPassword     = new String(NewPasswordText.getPassword());
                 String ConfirmPassword = new String(ConfirmPasswordText.getPassword());
 
                 String Message = viewModel.update(
                         Username, Name, NewUsername, Email,
-                        Address, Role,
+                        Address, Contact,
                         NewPassword, ConfirmPassword
                 );
 
@@ -285,11 +283,6 @@ public class UserFormView extends JPanel {
         UsernameText.setText(data.get("username"));
         EmailText.setText(data.get("email"));
         AddressText.setText(data.get("address"));
-
-        if (Objects.equals(data.get("role"), "Admin")) {
-            RoleComboBox.setSelectedIndex(0);
-        } else {
-            RoleComboBox.setSelectedIndex(1);
-        }
+        ContactText.setText(data.get("contact"));
     }
 }

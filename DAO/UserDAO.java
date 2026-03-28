@@ -34,8 +34,8 @@ public class UserDAO {
                         rs.getString("p.Name"),
                         rs.getString("p.Email"),
                         rs.getString("p.Status"),
-                        rs.getString("p.Contact"),
-                        rs.getString("p.Address")
+                        rs.getString("p.Address"),
+                        rs.getString("p.Contact")
                 );
             }
 
@@ -146,11 +146,11 @@ public class UserDAO {
 
     //EDIT USER
     public void updateByUserID(int userID, String name, String newUsername, String email,
-                               String password, String address, String role) {
+                               String password, String address, String role, String contact) {
 
         String updatePerson = """
         UPDATE person
-        SET Name = ?, Email = ?, Address = ?
+        SET Name = ?, Email = ?, Address = ?, Contact = ?
         WHERE PersonID = ?
     """;
 
@@ -167,7 +167,8 @@ public class UserDAO {
                 ps.setString(1, name);
                 ps.setString(2, email);
                 ps.setString(3, address);
-                ps.setInt(4, userID);
+                ps.setString(4, contact);
+                ps.setInt(5, userID);
                 ps.executeUpdate();
             }
 
@@ -186,5 +187,4 @@ public class UserDAO {
             throw new RuntimeException("Failed to update user", e);
         }
     }
-
 }

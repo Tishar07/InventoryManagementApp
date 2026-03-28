@@ -15,10 +15,10 @@ public class UserFormViewModel {
     }
 
     public String update(String username, String name, String newUsername, String email,
-                         String address, String role,
+                         String address, String contact,
                          String newPassword, String confirmPassword) {
 
-        // ── Field Validation ─────────────────────────────────────────────────
+        // Field Validation
         if (name == null || name.trim().length() < 2 || !name.matches("^[A-Za-z]+([ '-][A-Za-z]+)*$")) {
             return "Invalid Name (Only letters, spaces, hyphen and apostrophe allowed)";
         }
@@ -35,11 +35,11 @@ public class UserFormViewModel {
             return "Invalid Address (At least 5 characters)";
         }
 
-        if (!Objects.equals(role, "Admin") && !Objects.equals(role, "Staff")) {
-            return "Invalid Role";
+        if (contact == null || contact.trim().isEmpty()) {
+            return "Contact cannot be empty";
         }
 
-        // ── Password Change (optional) ───────────────────────────────────────
+        // Password Change
         String passwordToSave;
         boolean anyPasswordFieldFilled = !newPassword.isEmpty() || !confirmPassword.isEmpty();
 
@@ -58,12 +58,16 @@ public class UserFormViewModel {
                 return "New password and confirmation do not match";
             }
 
+            if (Objects.equals(newPassword, existing.getPassword())) {
+                return "New password must be different from the current password";
+            }
+
             passwordToSave = newPassword;
         } else {
             passwordToSave = existing.getPassword();
         }
 
-        userDAO.updateByUserID(existing.getUserid(), name, newUsername, email, passwordToSave, address, role);
+        userDAO.updateByUserID(existing.getUserid(), name, newUsername, email, passwordToSave, address, existing.getRole(), contact);
         return "Updated Successfully";
     }
 
@@ -74,7 +78,7 @@ public class UserFormViewModel {
         data.put("username", u.getUsername());
         data.put("email",    u.getEmail());
         data.put("address",  u.getAddress());
-        data.put("role",     u.getRole());
+        data.put("contact",  u.getContact());
         return data;
     }
 }
