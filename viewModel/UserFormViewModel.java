@@ -50,8 +50,24 @@ public class UserFormViewModel {
                 return "Please fill in both password fields to change your password";
             }
 
-            if (newPassword.length() < 6) {
-                return "New password must be at least 6 characters";
+            if (newPassword.length() < 3 || newPassword.length() > 20) {
+                return "Password must be between 3 and 20 characters";
+            }
+
+            if (!newPassword.matches(".*[A-Z].*")) {
+                return "Password must contain at least one uppercase letter";
+            }
+
+            if (!newPassword.matches(".*[a-z].*")) {
+                return "Password must contain at least one lowercase letter";
+            }
+
+            if (!newPassword.matches(".*[0-9].*")) {
+                return "Password must contain at least one number";
+            }
+
+            if (!newPassword.matches(".*[^A-Za-z0-9].*")) {
+                return "Password must contain at least one symbol";
             }
 
             if (!Objects.equals(newPassword, confirmPassword)) {

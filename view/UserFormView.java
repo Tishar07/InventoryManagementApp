@@ -16,8 +16,9 @@ public class UserFormView extends JPanel {
     JPanel Form = new JPanel();
     GridBagConstraints gbc = new GridBagConstraints();
 
-    JPanel BackPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+    JPanel BackPanel = new JPanel(new BorderLayout());
     JButton BackBtn = ButtonFactory.createButtonPlain();
+    JButton LogoutBtn = ButtonFactory.createButtonPlain();
 
     JPanel NamePanel = new JPanel();
     JLabel NameLabel = LabelFactory.creatFormLabel();
@@ -77,12 +78,25 @@ public class UserFormView extends JPanel {
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.insets = new Insets(10, 15, 10, 15);
 
-        BackPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        BackPanel.setBackground(Color.WHITE);
+        // Back button
+        JPanel BackLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        BackLeft.setBackground(Color.WHITE);
         BackBtn.setText("← Back");
         BackBtn.setBackground(new Color(220, 53, 69));
         BackBtn.setForeground(Color.WHITE);
-        BackPanel.add(BackBtn);
+        BackLeft.add(BackBtn);
+
+        // Logout button
+        JPanel BackRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        BackRight.setBackground(Color.WHITE);
+        LogoutBtn.setText("Logout →");
+        LogoutBtn.setBackground(new Color(220, 53, 69));
+        LogoutBtn.setForeground(Color.WHITE);
+        BackRight.add(LogoutBtn);
+
+        BackPanel.setBackground(Color.WHITE);
+        BackPanel.add(BackLeft, BorderLayout.WEST);
+        BackPanel.add(BackRight, BorderLayout.EAST);
         Form.add(BackPanel, gbc);
 
         // name
@@ -240,6 +254,14 @@ public class UserFormView extends JPanel {
             }
         });
 
+        LogoutBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Session.clear();
+                Navigator.showLogin();
+            }
+        });
+
         CancelBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -266,8 +288,10 @@ public class UserFormView extends JPanel {
 
                 if (Objects.equals(Message, "Updated Successfully")) {
                     Username = NewUsername;
+                    Session.setUsername(NewUsername);
                     JOptionPane.showMessageDialog(
                             null, Message, "Success", JOptionPane.INFORMATION_MESSAGE);
+                    Navigator.showDashboard();
                 } else {
                     JOptionPane.showMessageDialog(
                             null, Message, "Warning", JOptionPane.WARNING_MESSAGE);

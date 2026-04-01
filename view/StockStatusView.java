@@ -24,7 +24,6 @@ public class StockStatusView extends JPanel {
     JScrollPane TableScrollPane;
 
     String[] columnNames = {"Product ID", "Product Name", "Current Stock"};
-    String[] filterOptions = {"Product ID", "Product Name"};
     Object[][] data;
 
     public StockStatusView(StockStatusViewModel viewModel) {
@@ -37,13 +36,12 @@ public class StockStatusView extends JPanel {
         setLayout(new BorderLayout());
         JPanel pagePanel = new JPanel(new BorderLayout());
 
-        // ── Header label ─────────────────────────────────────────
         StockStatusLabel.setFont(new Font("Arial", Font.BOLD, 28));
         StockStatusLabel.setForeground(new Color(30, 75, 176));
         StockStatusLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
 
-        // ── Top bar — use first constructor so cmbSort is visible ─
-        topbar = new TopBarFactory("Search:", filterOptions);
+        // Stock In/Out constructor
+        topbar = new TopBarFactory("Search:", "");
         topbar.getBtnAdd().setVisible(false);
         topbar.getBtnViewEdit().setVisible(false);
         topbar.getBtnDelete().setVisible(false);
@@ -52,15 +50,14 @@ public class StockStatusView extends JPanel {
         HeaderPanel.add(StockStatusLabel);
         HeaderPanel.add(topbar);
 
-        // TABLE
         data = viewModel.FetchStockStatus();
-        StockStatusTableModel = new DefaultTableModel(data, columnNames){
+        StockStatusTableModel = new DefaultTableModel(data, columnNames) {
             @Override
             public Class<?> getColumnClass(int column) {
                 switch (column) {
-                    case 0: return Integer.class; // Product ID
-                    case 2: return Integer.class; // Current Stock
-                    default: return String.class; // Product Name
+                    case 0: return Integer.class;
+                    case 2: return Integer.class;
+                    default: return String.class;
                 }
             }
         };
@@ -100,21 +97,13 @@ public class StockStatusView extends JPanel {
     public void Actions() {
         topbar.getBtnSearch().addActionListener(e -> {
             String value = topbar.getTxtSearch().getText().trim();
-            String filter = (String) topbar.getCmbSort().getSelectedItem();
-
             if (value.isEmpty()) {
                 StockStatusTableModel.setDataVector(viewModel.FetchStockStatus(), columnNames);
-                return;
-            }
-
-            // Filterby
-            TableRowSorter<DefaultTableModel> sorter =
-                    (TableRowSorter<DefaultTableModel>) StockStatusTable.getRowSorter();
-
-            if ("Product ID".equals(filter)) {
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + value, 0));
             } else {
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + value, 1));
+                StockStatusTableModel.setDataVector(viewModel.FetchStockStatus(), columnNames);
+                TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(StockStatusTableModel);
+                StockStatusTable.setRowSorter(sorter);
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + value));
             }
         });
     }
