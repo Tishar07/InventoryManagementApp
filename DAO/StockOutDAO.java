@@ -19,20 +19,25 @@ public class StockOutDAO {
         ArrayList<StockOut> list = new ArrayList<>();
         String sql = """
                 SELECT
-                    st.TransactionID,
-                    st.ProductID,   pr.ProductName,
-                    st.RetailerID,
-                    COALESCE(p.Name, '-') AS RetailerName,
-                    st.Quantity,
-                    st.TransactionType,
-                    st.Status,
-                    st.Notes,
-                    st.TransactionDate
+                	st.TransactionID,
+                	st.ProductID,   pr.ProductName,
+                	st.RetailerID,
+                	COALESCE(p.Name, '-') AS RetailerName,
+                	st.Quantity,
+                	st.TransactionType,
+                	st.Status,
+                	st.Notes,
+                	st.TransactionDate
                 FROM stocktransaction st
-                JOIN product pr ON st.ProductID = pr.ProductID
-                LEFT JOIN retailer r ON st.RetailerID = r.RetailerID
-                LEFT JOIN person   p ON r.PersonID    = p.PersonID
+                 JOIN product pr ON st.ProductID = pr.ProductID
+                left JOIN retailer r ON st.RetailerID = r.RetailerID
+                left JOIN person   p ON r.PersonID    = p.PersonID
                 WHERE st.TransactionType IN ('RETAILER_OUT', 'DISPOSED')
+                AND pr.ProductStatus = 'Available'
+                AND (
+                        st.TransactionType = 'DISPOSED'
+                     OR (st.TransactionType = 'RETAILER_OUT' AND p.Status = 'Active')
+                )
                 ORDER BY st.TransactionID DESC
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -308,23 +313,6 @@ public class StockOutDAO {
     // ── Deduct from BOTH stock and stockstatus ────────────────────
     private void deductStock(int productId, int quantity) {
 
-        // 1. Update stock table
-        String sql1 = """
-                UPDATE stock
-                SET QuantityAvailable = QuantityAvailable - ?,
-                    LastUpdatedDate   = CURDATE()
-                WHERE ProductID = ?
-                """;
-        try (PreparedStatement ps = conn.prepareStatement(sql1)) {
-            ps.setInt(1, quantity);
-            ps.setInt(2, productId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // 2. Update stockstatus table — read by StockStatusDAO
-        //    and Dashboard Category chart
         String sql2 = """
                 UPDATE stockstatus
                 SET CurrentStock = CurrentStock - ?,

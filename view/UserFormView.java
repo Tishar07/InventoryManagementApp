@@ -268,7 +268,6 @@ public class UserFormView extends JPanel {
                     Username = NewUsername;
                     JOptionPane.showMessageDialog(
                             null, Message, "Success", JOptionPane.INFORMATION_MESSAGE);
-                    Navigator.showDashboard();
                 } else {
                     JOptionPane.showMessageDialog(
                             null, Message, "Warning", JOptionPane.WARNING_MESSAGE);

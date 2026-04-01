@@ -24,7 +24,7 @@ public class StockInView extends JPanel{
     JTable StockInTable ;
     TopBarFactory topbar;
     String[] sortOptions = {"ID", "Name", "Status"};
-    String[] columnNames = {"Transaction ID", "Product name", "Supplier Name", "Quantity", "status","Date"};
+    String[] columnNames = {"Transaction ID", "Product name", "Supplier", "Quantity", "status","Date"};
     Object[][] data ;
     JScrollPane TableScrollPane;
 

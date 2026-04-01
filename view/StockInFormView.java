@@ -263,6 +263,9 @@ public class StockInFormView extends JPanel {
                                 Message,
                                 "Stock In Status",
                                 JOptionPane.INFORMATION_MESSAGE);
+                        if(Objects.equals(Message, "Stock In order Saved !")){
+                            Navigator.showStockIn();
+                        }
                     }
                 }else{
                     Message = viewModel.update(transactionID,p.getProductId(),s.getSupplierId(),p.getProductName(),s.getName(),
@@ -271,6 +274,9 @@ public class StockInFormView extends JPanel {
                             Message,
                             "Stock In Status",
                             JOptionPane.INFORMATION_MESSAGE);
+                    if(Objects.equals(Message, "Stock In order Updated !")){
+                        Navigator.showStockIn();
+                    }
                 }
 
             }

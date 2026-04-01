@@ -5,6 +5,7 @@ import view.components.SideMenuBar;
 import viewModel.StockStatusViewModel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -53,18 +54,27 @@ public class StockStatusView extends JPanel {
 
         // TABLE
         data = viewModel.FetchStockStatus();
-        StockStatusTableModel = new DefaultTableModel(data, columnNames) {
+        StockStatusTableModel = new DefaultTableModel(data, columnNames){
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
+            public Class<?> getColumnClass(int column) {
+                switch (column) {
+                    case 0: return Integer.class; // Product ID
+                    case 2: return Integer.class; // Current Stock
+                    default: return String.class; // Product Name
+                }
             }
         };
         StockStatusTable = new JTable(StockStatusTableModel);
+        StockStatusTable.setDefaultEditor(Object.class, null);
         StockStatusTable.setFont(new Font("Arial", Font.PLAIN, 14));
         StockStatusTable.setRowHeight(30);
         StockStatusTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         StockStatusTable.getTableHeader().setBackground(new Color(230, 230, 250));
         StockStatusTable.setGridColor(new Color(220, 220, 220));
+        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+        leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+        StockStatusTable.setDefaultRenderer(Object.class, leftRenderer);
+        StockStatusTable.setDefaultRenderer(Integer.class, leftRenderer);
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(StockStatusTableModel);
         StockStatusTable.setRowSorter(sorter);

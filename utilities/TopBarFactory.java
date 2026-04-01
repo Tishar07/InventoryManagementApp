@@ -65,6 +65,8 @@ public class TopBarFactory extends JPanel {
         add(txtSearch);
         add(btnSearch);
     }
+
+    //Product view
     public TopBarFactory(String searchLabelText, String[] sortOptions, String productViewName) {
 
         setLayout(new BorderLayout());
@@ -126,7 +128,7 @@ public class TopBarFactory extends JPanel {
         add(rightPanel, BorderLayout.EAST);
     }
 
-
+    //Stock In and Out
     public TopBarFactory(String searchLabelText, String productViewName) {
 
         setLayout(new BorderLayout());

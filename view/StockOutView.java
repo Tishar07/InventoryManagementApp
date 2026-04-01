@@ -25,7 +25,7 @@ public class StockOutView extends JPanel {
 
     // ── First constructor needs a sortOptions array ───────────────
     String[] sortOptions = {"ID", "Retailer", "Product", "Quantity", "Status"};
-    String[] columnNames = {"Transaction ID", "Retailer", "Product", "Quantity", "Status", "Notes", "Date"};
+    String[] columnNames = {"Transaction ID", "Product Name", "Retailer", "Quantity", "Status","Date"};
     Object[][] data;
 
     public StockOutView(StockOutViewModel viewModel) {

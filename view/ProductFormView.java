@@ -615,7 +615,7 @@ public class ProductFormView extends JPanel{
                                 "Update Status",
                                 JOptionPane.PLAIN_MESSAGE
                         );
-
+                        Navigator.showProduct();
                     }else{
                         JOptionPane.showMessageDialog(
                                 null,
@@ -634,7 +634,7 @@ public class ProductFormView extends JPanel{
                                 "Save Status",
                                 JOptionPane.PLAIN_MESSAGE
                         );
-
+                        Navigator.showProduct();
                     }else{
                         JOptionPane.showMessageDialog(
                                 null,

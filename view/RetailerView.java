@@ -169,14 +169,5 @@ public class RetailerView extends JPanel {
         });
 
     }
-    public static void main(String[] args) throws SQLException {
-        Connection conn= DBConnection.getConnection();
-        RetailerDAO dao = new RetailerDAO(conn);
-        RetailerViewModel pvm = new RetailerViewModel(dao);
-        RetailerView pv =new RetailerView(pvm);
-        JFrame test = new JFrame();
-        test.add(pv);
-        test.setVisible(true);
-    }
 
 }

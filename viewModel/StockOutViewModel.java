@@ -26,16 +26,15 @@ public class StockOutViewModel {
     }
 
     private Object[][] toArray(ArrayList<StockOut> list) {
-        Object[][] data = new Object[list.size()][7];
+        Object[][] data = new Object[list.size()][6];
         for (int i = 0; i < list.size(); i++) {
             StockOut s = list.get(i);
             data[i][0] = s.getTransactionId();
-            data[i][1] = s.getRetailerName();
-            data[i][2] = s.getProductName();
+            data[i][1] = s.getProductName();
+            data[i][2] = s.getRetailerName();
             data[i][3] = s.getQuantity();
             data[i][4] = s.getStatus();
-            data[i][5] = s.getNotes();
-            data[i][6] = s.getTransactionDate();
+            data[i][5] = s.getTransactionDate();
         }
         return data;
     }
