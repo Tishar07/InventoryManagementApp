@@ -63,8 +63,6 @@ public class HistoryView extends JPanel {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setBorder(null);
-
-        // ── Top banner ───────────────────────────────────────────
         JPanel bannerPanel = new JPanel(new BorderLayout());
         bannerPanel.setBackground(BLUE);
         bannerPanel.setPreferredSize(new Dimension(0, 80));
@@ -148,6 +146,31 @@ public class HistoryView extends JPanel {
         HistoryTable.getTableHeader().setForeground(WHITE);
         HistoryTable.getTableHeader().setPreferredSize(new Dimension(0, 38));
 
+        applyRenderers();
+
+        int[] widths = {80, 110, 160, 130, 130, 80, 130, 100, 160};
+        for (int i = 0; i < widths.length; i++) {
+            HistoryTable.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
+        }
+
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(HistoryModel);
+        HistoryTable.setRowSorter(sorter);
+        TableScrollPane = new JScrollPane(HistoryTable);
+        TableScrollPane.setBorder(BorderFactory.createEmptyBorder(15, 20, 20, 20));
+        TableScrollPane.getViewport().setBackground(WHITE);
+        countLabel.setText("Total Records: " + data.length);
+        HistoryPanel.add(HeaderPanel, BorderLayout.NORTH);
+        HistoryPanel.add(TableScrollPane, BorderLayout.CENTER);
+        scrollPane.setViewportView(HistoryPanel);
+        pagePanel.add(skeleton, BorderLayout.WEST);
+        pagePanel.add(scrollPane, BorderLayout.CENTER);
+        add(pagePanel, BorderLayout.CENTER);
+        Actions(countLabel);
+    }
+
+    private void applyRenderers() {
+
+        // Default renderer (all columns)
         HistoryTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -164,7 +187,6 @@ public class HistoryView extends JPanel {
             }
         });
 
-        // Type column badge
         HistoryTable.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -204,25 +226,6 @@ public class HistoryView extends JPanel {
                 return this;
             }
         });
-
-        int[] widths = {80, 110, 160, 130, 130, 80, 130, 100, 160};
-        for (int i = 0; i < widths.length; i++) {
-            HistoryTable.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
-        }
-
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(HistoryModel);
-        HistoryTable.setRowSorter(sorter);
-        TableScrollPane = new JScrollPane(HistoryTable);
-        TableScrollPane.setBorder(BorderFactory.createEmptyBorder(15, 20, 20, 20));
-        TableScrollPane.getViewport().setBackground(WHITE);
-        countLabel.setText("Total Records: " + data.length);
-        HistoryPanel.add(HeaderPanel, BorderLayout.NORTH);
-        HistoryPanel.add(TableScrollPane, BorderLayout.CENTER);
-        scrollPane.setViewportView(HistoryPanel);
-        pagePanel.add(skeleton, BorderLayout.WEST);
-        pagePanel.add(scrollPane, BorderLayout.CENTER);
-        add(pagePanel, BorderLayout.CENTER);
-        Actions(countLabel);
     }
 
     public void Actions(JLabel countLabel) {
@@ -233,6 +236,7 @@ public class HistoryView extends JPanel {
                     ? viewModel.FetchHistory()
                     : viewModel.SearchHistory(value);
             HistoryModel.setDataVector(result, columnNames);
+            applyRenderers();
             countLabel.setText("Total Records: " + result.length);
         });
 
@@ -242,6 +246,7 @@ public class HistoryView extends JPanel {
                     ? viewModel.FetchHistory()
                     : viewModel.FilterByType(selected);
             HistoryModel.setDataVector(result, columnNames);
+            applyRenderers(); // ← re-apply after data refresh
             countLabel.setText("Total Records: " + result.length);
         });
 
@@ -250,6 +255,7 @@ public class HistoryView extends JPanel {
             cmbFilter.setSelectedIndex(0);
             Object[][] result = viewModel.FetchHistory();
             HistoryModel.setDataVector(result, columnNames);
+            applyRenderers(); // ← re-apply after data refresh
             countLabel.setText("Total Records: " + result.length);
         });
     }

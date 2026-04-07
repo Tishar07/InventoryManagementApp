@@ -6,6 +6,7 @@ import view.components.SideMenuBar;
 import viewModel.StockOutViewModel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -23,10 +24,19 @@ public class StockOutView extends JPanel {
     TopBarFactory topbar;
     JScrollPane TableScrollPane;
 
-    // ── First constructor needs a sortOptions array ───────────────
     String[] sortOptions = {"ID", "Retailer", "Product", "Quantity", "Status"};
-    String[] columnNames = {"Transaction ID", "Product Name", "Retailer", "Quantity", "Status","Date"};
+    String[] columnNames = {"Transaction ID", "Retailer", "Product", "Quantity", "Status", "Notes", "Date"};
     Object[][] data;
+
+    private static final Color GREEN     = new Color(34, 139, 34);
+    private static final Color GREEN_BG  = new Color(220, 255, 220);
+    private static final Color RED       = new Color(180, 30, 30);
+    private static final Color RED_BG    = new Color(255, 220, 220);
+    private static final Color ORANGE    = new Color(180, 100, 0);
+    private static final Color ORANGE_BG = new Color(255, 240, 210);
+    private static final Color GREY      = new Color(100, 100, 100);
+    private static final Color ROW_ALT   = new Color(248, 250, 255);
+    private static final Color WHITE     = Color.WHITE;
 
     public StockOutView(StockOutViewModel viewModel) {
         this.viewModel = viewModel;
@@ -42,7 +52,6 @@ public class StockOutView extends JPanel {
         StockOutLabel.setForeground(new Color(30, 75, 176));
         StockOutLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
 
-        // ── First constructor: all 4 buttons visible ──────────────
         topbar = new TopBarFactory("Search Stock Out:", sortOptions);
 
         HeaderPanel.setLayout(new BoxLayout(HeaderPanel, BoxLayout.Y_AXIS));
@@ -63,6 +72,8 @@ public class StockOutView extends JPanel {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(StockOutTableModel);
         StockOutTable.setRowSorter(sorter);
 
+        applyRenderers();
+
         TableScrollPane = new JScrollPane(StockOutTable);
         TableScrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
@@ -81,12 +92,32 @@ public class StockOutView extends JPanel {
         Actions();
     }
 
+    private void applyRenderers() {
+        StockOutTable.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int col) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                setHorizontalAlignment(JLabel.CENTER);
+                setFont(new Font("Arial", Font.BOLD, 12));
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                if (!isSelected && value != null) {
+                    switch (value.toString()) {
+                        case "Completed": setForeground(GREEN);  setBackground(GREEN_BG);  break;
+                        case "Waiting":   setForeground(ORANGE); setBackground(ORANGE_BG); break;
+                        case "Cancelled": setForeground(RED);    setBackground(RED_BG);    break;
+                        default:          setForeground(GREY);   setBackground(row % 2 == 0 ? WHITE : ROW_ALT);
+                    }
+                }
+                return this;
+            }
+        });
+    }
+
     public void Actions() {
 
-        // ── Add ───────────────────────────────────────────────────
         topbar.getBtnAdd().addActionListener(e -> Navigator.showStockOutForm());
 
-        // ── Cancel (Delete button relabelled) ─────────────────────
         topbar.getBtnDelete().addActionListener(e -> {
             if (StockOutTable.getSelectedRow() == -1) {
                 JOptionPane.showMessageDialog(null,
@@ -107,6 +138,7 @@ public class StockOutView extends JPanel {
                     if (message.equals("Successfully Cancelled")) {
                         data = viewModel.FetchStockOuts();
                         StockOutTableModel.setDataVector(data, columnNames);
+                        applyRenderers(); // ← re-apply after data refresh
                         JOptionPane.showMessageDialog(null,
                                 message, "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -117,7 +149,6 @@ public class StockOutView extends JPanel {
             }
         });
 
-        // ── View / Edit ───────────────────────────────────────────
         topbar.getBtnViewEdit().addActionListener(e -> {
             if (StockOutTable.getSelectedRow() == -1) {
                 JOptionPane.showMessageDialog(null,
@@ -130,7 +161,6 @@ public class StockOutView extends JPanel {
             }
         });
 
-        // ── Search ────────────────────────────────────────────────
         topbar.getBtnSearch().addActionListener(e -> {
             String value = topbar.getTxtSearch().getText();
             if (value.isEmpty()) {
@@ -138,6 +168,7 @@ public class StockOutView extends JPanel {
             } else {
                 StockOutTableModel.setDataVector(viewModel.SearchStockOuts(value), columnNames);
             }
+            applyRenderers();
         });
     }
 }
