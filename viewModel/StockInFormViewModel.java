@@ -21,6 +21,10 @@ public class StockInFormViewModel {
     }
     public String save(int productID, int supplierID, String ProductName, String SupplierName ,
                        int quantity, String status, LocalDateTime transactionDate, String notes){
+        String Error = validate(supplierID,productID,quantity,status);
+        if(Error!=null){
+            return Error;
+        }
         StockIn s = new StockIn(-1,productID,supplierID,ProductName,SupplierName,
                 quantity,status,transactionDate,notes);
         stockInDAO.save(s);
@@ -29,18 +33,18 @@ public class StockInFormViewModel {
 
     public String update(int transactionID, int productID, int supplierID,String ProductName,String SupplierName ,
                          int quantity, String status, LocalDateTime transactionDate, String notes,String prevStatus){
+        String Error = validate(supplierID,productID,quantity,status);
+        if(Error!=null){
+            return Error;
+        }
         StockIn s = new StockIn(transactionID,productID,supplierID,ProductName,SupplierName,
                 quantity,status,transactionDate,notes);
         if(Objects.equals(prevStatus, "Completed") && Objects.equals(status, "Completed") ){
-            return "Already in Completed";
-        }
-
-        if((Objects.equals(prevStatus, "Waiting") && Objects.equals(status, "Waiting"))){
-            return "Already in Waiting";
+            return "A Completed stock out cannot be changed";
         }
 
         if(Objects.equals(prevStatus, "Cancelled") && Objects.equals(status, "Cancelled")){
-            return "Already in Cancelled";
+            return "A Cancelled stock out cannot be changed";
         }
 
         if((Objects.equals(prevStatus, "Cancelled") && Objects.equals(status, "Completed"))||
@@ -63,6 +67,25 @@ public class StockInFormViewModel {
 
     public StockIn FetchExistingStockIn(int transactionID){
         return stockInDAO.getExistingStockIn(transactionID);
+    }
+
+
+    private String validate(int SupplierID, int productId, int quantity, String status) {
+
+        if (productId <= 0) {
+            return "Please select a Product";
+        }
+
+        if (quantity <= 0){
+            return "Quantity must be greater than 0";
+        }
+
+        if (status == null || (!status.equals("Waiting") && !status.equals("Completed") &&
+                                !status.equals("Cancelled"))){
+            return "Status must be Waiting, Completed or Cancelled";
+        }
+
+        return null;
     }
 
 }

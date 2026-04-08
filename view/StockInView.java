@@ -11,6 +11,8 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class StockInView extends JPanel {
     private StockInViewModel viewModel;
@@ -22,7 +24,7 @@ public class StockInView extends JPanel {
     DefaultTableModel StockInModel;
     JTable StockInTable;
     TopBarFactory topbar;
-    String[] sortOptions = {"ID", "Name", "Status"};
+
     String[] columnNames = {"Transaction ID", "Product name", "Supplier Name", "Quantity", "status", "Date"};
     Object[][] data;
     JScrollPane TableScrollPane;
@@ -65,7 +67,19 @@ public class StockInView extends JPanel {
         HeaderPanel.add(topbar);
 
         data = viewModel.FetchStockIn();
-        StockInModel = new DefaultTableModel(data, columnNames);
+
+        StockInModel = new DefaultTableModel(data, columnNames) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0 || columnIndex == 3) {
+                    return Integer.class;
+                }
+                if (columnIndex == 5) {
+                    return LocalDateTime.class;
+                }
+                return String.class;
+            }
+        };
         StockInTable = new JTable(StockInModel);
 
         StockInTable.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -74,8 +88,30 @@ public class StockInView extends JPanel {
         StockInTable.getTableHeader().setBackground(new Color(230, 230, 250));
         StockInTable.setGridColor(new Color(220, 220, 220));
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(StockInModel);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+        sorter.setComparator(5, (a, b) -> {
+            if (a == null && b == null) return 0;
+            if (a == null) return -1;
+            if (b == null) return 1;
+
+            LocalDateTime d1 = LocalDateTime.parse(a.toString(), formatter);
+            LocalDateTime d2 = LocalDateTime.parse(b.toString(), formatter);
+
+            return d1.compareTo(d2);
+        });
+        StockInTable.setAutoCreateRowSorter(false);
+
         StockInTable.setRowSorter(sorter);
         StockInTable.setDefaultEditor(Object.class, null);
+
+        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+        leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+
+        for (int i = 0; i < StockInTable.getColumnCount(); i++) {
+            StockInTable.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
+        }
 
         applyRenderers();
 

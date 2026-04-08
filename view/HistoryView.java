@@ -6,6 +6,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class HistoryView extends JPanel {
 
@@ -131,9 +133,31 @@ public class HistoryView extends JPanel {
 
         data = viewModel.FetchHistory();
         HistoryModel = new DefaultTableModel(data, columnNames) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+
+                // Integer columns
+                if (columnIndex == 0 || columnIndex == 1 || columnIndex == 5) {
+                    return Integer.class;
+                }
+
+                // Date column
+                if (columnIndex == 8) {
+                    return LocalDateTime.class;
+                }
+
+                return String.class;
+            }
         };
+
         HistoryTable = new JTable(HistoryModel);
+
         HistoryTable.setFont(new Font("Arial", Font.PLAIN, 13));
         HistoryTable.setRowHeight(34);
         HistoryTable.setShowVerticalLines(false);
@@ -141,20 +165,44 @@ public class HistoryView extends JPanel {
         HistoryTable.setSelectionBackground(new Color(210, 225, 255));
         HistoryTable.setSelectionForeground(Color.BLACK);
         HistoryTable.setIntercellSpacing(new Dimension(0, 1));
+
         HistoryTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
         HistoryTable.getTableHeader().setBackground(BLUE);
         HistoryTable.getTableHeader().setForeground(WHITE);
         HistoryTable.getTableHeader().setPreferredSize(new Dimension(0, 38));
 
-        applyRenderers();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(HistoryModel);
 
-        int[] widths = {80, 110, 160, 130, 130, 80, 130, 100, 160};
+
+        sorter.setComparator(8, (a, b) -> {
+            if (a == null && b == null) return 0;
+            if (a == null) return -1;
+            if (b == null) return 1;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime d1 = LocalDateTime.parse(a.toString(), formatter);
+            LocalDateTime d2 = LocalDateTime.parse(b.toString(), formatter);
+
+            return d1.compareTo(d2);
+        });
+
+        HistoryTable.setAutoCreateRowSorter(false);
+        HistoryTable.setRowSorter(sorter);
+
+        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+        leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+
+        for (int i = 0; i < HistoryTable.getColumnCount(); i++) {
+            HistoryTable.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
+        }
+
+
+        int[] widths = {80, 110, 160, 130, 130, 80, 100, 100, 160};
+
         for (int i = 0; i < widths.length; i++) {
             HistoryTable.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
         }
+        applyRenderers();
 
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(HistoryModel);
-        HistoryTable.setRowSorter(sorter);
         TableScrollPane = new JScrollPane(HistoryTable);
         TableScrollPane.setBorder(BorderFactory.createEmptyBorder(15, 20, 20, 20));
         TableScrollPane.getViewport().setBackground(WHITE);

@@ -236,27 +236,39 @@ public class StockInFormView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String Message;
+                Product p =null;
                 int quantity=0;
-                boolean valid = false;
-                Product p = productArrayList.get(ProductComboBox.getSelectedIndex());
+                boolean validQty = false;
+                boolean validProduct = false;
+
                 Supplier s = supplierArrayList.get(SupplierComboBox.getSelectedIndex());
                 String Status =(String) StatusComboBox.getSelectedItem();
                 String quantityStr = QuantityField.getText();
                 LocalDateTime dateTime = LocalDateTime.now();
                 String notes = NoteField.getText();
+                if(productArrayList != null && !productArrayList.isEmpty()){
+                    p = productArrayList.get(ProductComboBox.getSelectedIndex());
+                    validProduct = true;
+
+                }else{
+                    JOptionPane.showMessageDialog(null,
+                            "No Product Selected",
+                            "ERROR",
+                            JOptionPane.ERROR_MESSAGE);
+                }
                 try {
                     quantity = Integer.parseInt(quantityStr);
-                    valid=true;
+                    validQty=true;
                 } catch (NumberFormatException f) {
                     JOptionPane.showMessageDialog(null,
-                            "Invalid Quantity",
+                            "Quantity should be a whole Number",
                             "ERROR",
                             JOptionPane.ERROR_MESSAGE);
                 }
 
 
                 if(EditMode==false){
-                    if (valid){
+                    if (validQty&&validProduct){
                         Message = viewModel.save(p.getProductId(),s.getSupplierId(),p.getProductName(),s.getName(),
                                 quantity,Status,dateTime,notes);
                         JOptionPane.showMessageDialog(null,

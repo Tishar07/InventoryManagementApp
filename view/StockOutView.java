@@ -11,6 +11,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class StockOutView extends JPanel {
 
@@ -25,8 +27,8 @@ public class StockOutView extends JPanel {
     TopBarFactory topbar;
     JScrollPane TableScrollPane;
 
-    String[] sortOptions = {"ID", "Retailer", "Product", "Quantity", "Status"};
-    String[] columnNames = {"Transaction ID", "Retailer", "Product", "Quantity", "Status", "Notes", "Date"};
+
+    String[] columnNames = {"Transaction ID", "Retailer", "Product", "Quantity", "Status","Date"};
     Object[][] data;
 
     private static final Color GREEN     = new Color(34, 139, 34);
@@ -63,7 +65,20 @@ public class StockOutView extends JPanel {
         HeaderPanel.add(topbar);
 
         data = viewModel.FetchStockOuts();
-        StockOutTableModel = new DefaultTableModel(data, columnNames);
+
+        StockOutTableModel = new DefaultTableModel(data, columnNames) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0 || columnIndex == 3) {
+                    return Integer.class;
+                }
+                if (columnIndex == 5) {
+                    return LocalDateTime.class;
+                }
+                return String.class;
+            }
+        };
+
         StockOutTable = new JTable(StockOutTableModel);
 
         StockOutTable.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -73,8 +88,31 @@ public class StockOutView extends JPanel {
         StockOutTable.setGridColor(new Color(220, 220, 220));
         StockOutTable.setDefaultEditor(Object.class, null);
 
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(StockOutTableModel);
-        StockOutTable.setRowSorter(sorter);
+        TableRowSorter<DefaultTableModel> outSorter =
+                new TableRowSorter<>(StockOutTableModel);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+        outSorter.setComparator(5, (a, b) -> {
+            if (a == null && b == null) return 0;
+            if (a == null) return -1;
+            if (b == null) return 1;
+
+            LocalDateTime d1 = LocalDateTime.parse(a.toString(), formatter);
+            LocalDateTime d2 = LocalDateTime.parse(b.toString(), formatter);
+
+            return d1.compareTo(d2);
+        });
+
+        StockOutTable.setAutoCreateRowSorter(false);
+        StockOutTable.setRowSorter(outSorter);
+
+        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+        leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+
+        for (int i = 0; i < StockOutTable.getColumnCount(); i++) {
+            StockOutTable.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
+        }
 
         applyRenderers();
 
