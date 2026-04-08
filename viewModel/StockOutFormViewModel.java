@@ -126,13 +126,23 @@ public class StockOutFormViewModel {
         } catch (NumberFormatException e) {
             return "Quantity must be a whole number";
         }
+
         if (qty <= 0)
             return "Quantity must be greater than 0";
 
+        boolean AvailableQuantity=validateStockAvailability(productId,qty);
+        if(!AvailableQuantity){
+            return "Stock Quantity is greater than Stock Available !";
+        }
         if (status == null || (!status.equals("Waiting") &&
                 !status.equals("Completed") && !status.equals("Cancelled")))
             return "Status must be Waiting, Completed or Cancelled";
 
         return null;
+    }
+
+    public boolean validateStockAvailability(int ProductID,int quantity){
+        int available = stockOutDAO.getProductStock(ProductID);
+        return quantity <= available;
     }
 }

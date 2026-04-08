@@ -102,15 +102,15 @@ public class DashboardDAO {
         Map<String, List<Integer>> StockPerMonth = new HashMap<>();
 
         String sql= """
-                SELECT
-                    MONTHNAME(ActionDate) AS Month,
-                    SUM(CASE WHEN TransactionType = 'SUPPLIER_IN' THEN Quantity ELSE 0 END) AS `Total In`,
-                    SUM(CASE WHEN TransactionType = 'RETAILER_OUT' THEN Quantity ELSE 0 END) AS `Total Out`
-                FROM stockhistory
-                WHERE YEAR(ActionDate) = YEAR(CURDATE())
-                GROUP BY MONTH(ActionDate), MONTHNAME(ActionDate)
-                ORDER BY MONTH(ActionDate);
-                """;
+            SELECT
+                MONTHNAME(ActionDate) AS Month,
+                SUM(CASE WHEN TransactionType = 'SUPPLIER_IN' OR TransactionType = 'DISPOSED'  THEN Quantity ELSE 0 END) AS `Total In`,
+                SUM(CASE WHEN TransactionType = 'RETAILER_OUT' THEN Quantity ELSE 0 END) AS `Total Out`
+            FROM stockhistory
+            WHERE YEAR(ActionDate) = YEAR(CURDATE()) AND Status ='Completed'
+            GROUP BY MONTH(ActionDate), MONTHNAME(ActionDate)
+            ORDER BY MONTH(ActionDate);
+            """;
 
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ResultSet rs = ps.executeQuery();

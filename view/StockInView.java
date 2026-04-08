@@ -6,6 +6,7 @@ import viewModel.StockInViewModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -53,11 +54,14 @@ public class StockInView extends JPanel {
         HeaderPanel.setLayout(new BoxLayout(HeaderPanel, BoxLayout.Y_AXIS));
 
         StockInLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        StockInLabel.setForeground(new Color(30, 75, 176));
+        StockInLabel.setForeground(Color.white);
         StockInLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
+        HeaderPanel.setBackground(new Color(30, 75, 176));
         HeaderPanel.add(StockInLabel);
 
-        topbar = new TopBarFactory("Search Retailer:", "");
+        topbar = new TopBarFactory("Search Stock In:", "");
+        topbar.setBackground(new Color(235, 241, 255));
+        topbar.setForeground(new Color(61, 83, 193));
         HeaderPanel.add(topbar);
 
         data = viewModel.FetchStockIn();
@@ -74,6 +78,11 @@ public class StockInView extends JPanel {
         StockInTable.setDefaultEditor(Object.class, null);
 
         applyRenderers();
+
+        JTableHeader header = StockInTable.getTableHeader();
+        header.setBackground(new Color(30, 75, 176));
+        header.setForeground(Color.white);
+        header.setFont(new Font("Arial",Font.BOLD,16));
 
         TableScrollPane = new JScrollPane(StockInTable);
         TableScrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));

@@ -10,6 +10,7 @@ import view.components.SideMenuBar;
 import viewModel.RetailerViewModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -54,13 +55,17 @@ public class RetailerView extends JPanel {
 
         //Set top label styling
         RetailerLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        RetailerLabel.setForeground(new Color(30, 75, 176));
+        RetailerLabel.setForeground(Color.white);
         RetailerLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
+
+        HeaderPanel.setBackground(new Color(30, 75, 176));
         HeaderPanel.add(RetailerLabel);
 
 
         //set Top bar menu
-        topbar = new TopBarFactory("Search Retailer:", sortOptions);
+        topbar = new TopBarFactory("Search Retailer:", 1);
+        topbar.setBackground(new Color(235, 241, 255));
+        topbar.setForeground(new Color(61, 83, 193));
         HeaderPanel.add(topbar);
 
         //set Table
@@ -78,6 +83,11 @@ public class RetailerView extends JPanel {
         RetailerTable.setDefaultEditor(Object.class, null);
         TableScrollPane = new JScrollPane(RetailerTable);
         TableScrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+
+        JTableHeader header = RetailerTable.getTableHeader();
+        header.setBackground(new Color(30, 75, 176));
+        header.setForeground(Color.white);
+        header.setFont(new Font("Arial",Font.BOLD,16));
 
         RetailerPanel.setLayout(new BorderLayout());
         RetailerPanel.add(HeaderPanel, BorderLayout.NORTH);

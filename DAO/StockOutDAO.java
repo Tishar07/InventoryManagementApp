@@ -444,4 +444,24 @@ public class StockOutDAO {
         try { Integer.parseInt(str); return true; }
         catch (NumberFormatException e) { return false; }
     }
+
+    public int getProductStock (int ProductID){
+        int quantity = 0 ;
+        String sql = """
+                SELECT CurrentStock
+                FROM stockstatus
+                WHERE ProductID = ?;
+                """;
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1,ProductID);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                quantity = rs.getInt("CurrentStock");
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return quantity;
+    }
+
 }

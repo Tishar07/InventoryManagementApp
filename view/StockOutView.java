@@ -8,6 +8,7 @@ import viewModel.StockOutViewModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 
@@ -49,13 +50,16 @@ public class StockOutView extends JPanel {
         JPanel pagePanel = new JPanel(new BorderLayout());
 
         StockOutLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        StockOutLabel.setForeground(new Color(30, 75, 176));
+        StockOutLabel.setForeground(Color.white);
         StockOutLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
 
-        topbar = new TopBarFactory("Search Stock Out:", sortOptions);
+        topbar = new TopBarFactory("Search Stock Out:", "");
 
         HeaderPanel.setLayout(new BoxLayout(HeaderPanel, BoxLayout.Y_AXIS));
         HeaderPanel.add(StockOutLabel);
+        HeaderPanel.setBackground(new Color(30, 75, 176));
+        topbar.setBackground(new Color(235, 241, 255));
+        topbar.setForeground(new Color(61, 83, 193));
         HeaderPanel.add(topbar);
 
         data = viewModel.FetchStockOuts();
@@ -73,6 +77,12 @@ public class StockOutView extends JPanel {
         StockOutTable.setRowSorter(sorter);
 
         applyRenderers();
+
+
+        JTableHeader header = StockOutTable.getTableHeader();
+        header.setBackground(new Color(30, 75, 176));
+        header.setForeground(Color.white);
+        header.setFont(new Font("Arial",Font.BOLD,16));
 
         TableScrollPane = new JScrollPane(StockOutTable);
         TableScrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
@@ -118,36 +128,6 @@ public class StockOutView extends JPanel {
 
         topbar.getBtnAdd().addActionListener(e -> Navigator.showStockOutForm());
 
-        topbar.getBtnDelete().addActionListener(e -> {
-            if (StockOutTable.getSelectedRow() == -1) {
-                JOptionPane.showMessageDialog(null,
-                        "Select a row to Cancel!",
-                        "Instruction", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                int choice = JOptionPane.showConfirmDialog(null,
-                        "Are you sure you want to cancel this stock out?",
-                        "Cancel Warning",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-
-                if (choice == JOptionPane.YES_OPTION) {
-                    int selectedRow   = StockOutTable.getSelectedRow();
-                    int transactionId = (int) StockOutTable.getValueAt(selectedRow, 0);
-                    String message    = viewModel.Cancel(transactionId);
-
-                    if (message.equals("Successfully Cancelled")) {
-                        data = viewModel.FetchStockOuts();
-                        StockOutTableModel.setDataVector(data, columnNames);
-                        applyRenderers(); // ← re-apply after data refresh
-                        JOptionPane.showMessageDialog(null,
-                                message, "Success", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(null,
-                                message, "Warning", JOptionPane.WARNING_MESSAGE);
-                    }
-                }
-            }
-        });
 
         topbar.getBtnViewEdit().addActionListener(e -> {
             if (StockOutTable.getSelectedRow() == -1) {

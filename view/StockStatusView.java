@@ -7,6 +7,7 @@ import viewModel.StockStatusViewModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 
@@ -37,17 +38,21 @@ public class StockStatusView extends JPanel {
         JPanel pagePanel = new JPanel(new BorderLayout());
 
         StockStatusLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        StockStatusLabel.setForeground(new Color(30, 75, 176));
+        StockStatusLabel.setForeground(Color.white);
         StockStatusLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
 
         // Stock In/Out constructor
         topbar = new TopBarFactory("Search:", "");
+        topbar.setBackground(new Color(235, 241, 255));
+        topbar.setForeground(new Color(61, 83, 193));
         topbar.getBtnAdd().setVisible(false);
         topbar.getBtnViewEdit().setVisible(false);
         topbar.getBtnDelete().setVisible(false);
 
         HeaderPanel.setLayout(new BoxLayout(HeaderPanel, BoxLayout.Y_AXIS));
         HeaderPanel.add(StockStatusLabel);
+
+        HeaderPanel.setBackground(new Color(30, 75, 176));
         HeaderPanel.add(topbar);
 
         data = viewModel.FetchStockStatus();
@@ -65,8 +70,10 @@ public class StockStatusView extends JPanel {
         StockStatusTable.setDefaultEditor(Object.class, null);
         StockStatusTable.setFont(new Font("Arial", Font.PLAIN, 14));
         StockStatusTable.setRowHeight(30);
-        StockStatusTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        StockStatusTable.getTableHeader().setBackground(new Color(230, 230, 250));
+        JTableHeader header = StockStatusTable.getTableHeader();
+        header.setBackground(new Color(30, 75, 176));
+        header.setForeground(Color.white);
+        header.setFont(new Font("Arial",Font.BOLD,16));
         StockStatusTable.setGridColor(new Color(220, 220, 220));
         DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
         leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);

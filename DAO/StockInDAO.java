@@ -6,6 +6,7 @@ import model.StockIn;
 import model.Supplier;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -248,7 +249,7 @@ public class StockInDAO {
             ps.setInt(6,stockIn.getQuantity());
             ps.setString(7,stockIn.getTransactionType());
             ps.setString(8,stockIn.getStatus());
-            ps.setTimestamp(9, Timestamp.valueOf(stockIn.getTransactionDate()));
+            ps.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
             ps.executeUpdate();
         }catch (SQLException e){
             e.printStackTrace();
@@ -340,8 +341,7 @@ public class StockInDAO {
             ps.setInt(6, stockIn.getQuantity());
             ps.setString(7, stockIn.getTransactionType());
             ps.setString(8, stockIn.getStatus());
-            ps.setTimestamp(9, Timestamp.valueOf(stockIn.getTransactionDate()));
-
+            ps.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

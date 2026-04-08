@@ -7,6 +7,7 @@ import viewModel.SupplierViewModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 
@@ -53,11 +54,15 @@ public class SupplierView extends JPanel {
         HeaderPanel.setLayout(new BoxLayout(HeaderPanel, BoxLayout.Y_AXIS));
 
         SupplierLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        SupplierLabel.setForeground(new Color(30, 75, 176));
+        SupplierLabel.setForeground(Color.white);
         SupplierLabel.setBorder(BorderFactory.createEmptyBorder(20, 30, 10, 0));
+
+        HeaderPanel.setBackground(new Color(30, 75, 176));
         HeaderPanel.add(SupplierLabel);
 
-        topbar = new TopBarFactory("Search Supplier:", sortOptions);
+        topbar = new TopBarFactory("Search Supplier:", 1);
+        topbar.setBackground(new Color(235, 241, 255));
+        topbar.setForeground(new Color(61, 83, 193));
         HeaderPanel.add(topbar);
 
         data = viewModel.FetchSuppliers();
@@ -66,10 +71,13 @@ public class SupplierView extends JPanel {
 
         SupplierTable.setFont(new Font("Arial", Font.PLAIN, 14));
         SupplierTable.setRowHeight(30);
-        SupplierTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        SupplierTable.getTableHeader().setBackground(new Color(230, 230, 250));
         SupplierTable.setGridColor(new Color(220, 220, 220));
         SupplierTable.setDefaultEditor(Object.class, null);
+
+        JTableHeader header = SupplierTable.getTableHeader();
+        header.setBackground(new Color(30, 75, 176));
+        header.setForeground(Color.white);
+        header.setFont(new Font("Arial",Font.BOLD,16));
 
         TableRowSorter<DefaultTableModel> sorter =
                 new TableRowSorter<>(SupplierModel);

@@ -23,7 +23,7 @@ public class StockIn {
         this.SupplierName =SupplierName;
         this.Quantity = quantity;
         this.Status = status;
-        this.TransactionDate = LocalDateTime.now();
+        this.TransactionDate = transactionDate;
         this.Notes = notes;
         this.TransactionType = "SUPPLIER_IN";
     }
