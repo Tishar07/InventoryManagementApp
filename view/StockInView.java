@@ -177,7 +177,11 @@ public class StockInView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = StockInTable.getSelectedRow();
-                int transactionID = (Integer) data[row][0];
+                int id =0;
+                if (row != -1) {
+                    id = Integer.parseInt(StockInTable.getValueAt(row, 0).toString());
+                }
+                int transactionID = id;
                 if (row != -1) {
                     Navigator.showStockInFormEdit(transactionID);
                 }
