@@ -169,6 +169,11 @@ public class StockInView extends JPanel {
                     StockInModel.setRowCount(0);
                     StockInModel.setDataVector(SearchValues, columnNames);
                 }
+
+                DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+                for (int i = 0; i < StockInTable.getColumnCount(); i++) {
+                    StockInTable.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
+                }
                 applyRenderers();
             }
         });

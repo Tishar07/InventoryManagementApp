@@ -186,6 +186,10 @@ public class StockOutView extends JPanel {
             } else {
                 StockOutTableModel.setDataVector(viewModel.SearchStockOuts(value), columnNames);
             }
+            DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+            for (int i = 0; i < StockOutTable.getColumnCount(); i++) {
+                StockOutTable.getColumnModel().getColumn(i).setCellRenderer(leftRenderer);
+            }
             applyRenderers();
         });
     }
